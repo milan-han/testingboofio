@@ -8,10 +8,20 @@
  * @param {number} alpha - Alpha value (0-1)
  * @returns {string} RGBA color string
  */
-function hexToRgba(hex, alpha = 0.3) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
+function hexToRgba(hex, alpha = 1) {
+    if (typeof hex !== 'string') {
+        return `rgba(0, 0, 0, ${alpha})`;
+    }
+    let clean = hex.replace('#', '');
+    if (clean.length === 3) {
+        clean = clean.split('').map(c => c + c).join('');
+    }
+    if (!/^[0-9a-fA-F]{6}$/.test(clean)) {
+        return `rgba(0, 0, 0, ${alpha})`;
+    }
+    const r = parseInt(clean.slice(0, 2), 16);
+    const g = parseInt(clean.slice(2, 4), 16);
+    const b = parseInt(clean.slice(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
@@ -20,15 +30,21 @@ function hexToRgba(hex, alpha = 0.3) {
  * @param {string} color - Color string
  * @returns {string} Darker color
  */
-function getDarkerShade(color) {
-    // Simple darkening by reducing brightness
-    if (color.startsWith('#')) {
-        const r = Math.max(0, parseInt(color.slice(1, 3), 16) - 40);
-        const g = Math.max(0, parseInt(color.slice(3, 5), 16) - 40);
-        const b = Math.max(0, parseInt(color.slice(5, 7), 16) - 40);
-        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+function getDarkerShade(color, amount = 40) {
+    if (typeof color !== 'string') {
+        return '#000000';
     }
-    return color;
+    let clean = color.replace('#', '');
+    if (clean.length === 3) {
+        clean = clean.split('').map(c => c + c).join('');
+    }
+    if (!/^[0-9a-fA-F]{6}$/.test(clean)) {
+        clean = '000000';
+    }
+    const r = Math.max(0, parseInt(clean.slice(0, 2), 16) - amount);
+    const g = Math.max(0, parseInt(clean.slice(2, 4), 16) - amount);
+    const b = Math.max(0, parseInt(clean.slice(4, 6), 16) - amount);
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
 /**
@@ -36,18 +52,21 @@ function getDarkerShade(color) {
  * @param {CanvasRenderingContext2D} ctx - Canvas context
  * @param {number} width - Canvas width
  * @param {number} height - Canvas height
- */
-function drawBlueprintGrid(ctx, width, height) {
-    const GRID_SPACING = 20;
+ * @param {number} [gridSize=20] - Grid spacing in pixels
+*/
+function drawBlueprintGrid(ctx, width, height, gridSize = 20) {
     const GRID_ALPHA = 0.15;
     
     ctx.save();
     ctx.globalAlpha = GRID_ALPHA;
-    ctx.strokeStyle = "#00BFFF";
+    ctx.strokeStyle = '#1a3a5c';
     ctx.lineWidth = 1;
+    if (typeof ctx.setLineDash === 'function') {
+        ctx.setLineDash([2, 2]);
+    }
     
     // Vertical lines
-    for (let x = 0; x <= width; x += GRID_SPACING) {
+    for (let x = 0; x <= width; x += gridSize) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
@@ -55,7 +74,7 @@ function drawBlueprintGrid(ctx, width, height) {
     }
     
     // Horizontal lines
-    for (let y = 0; y <= height; y += GRID_SPACING) {
+    for (let y = 0; y <= height; y += gridSize) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
@@ -76,8 +95,19 @@ function drawBlueprintGrid(ctx, width, height) {
 }
 
 // Export functions (IIFE pattern for compatibility)
+window.hexToRgba = hexToRgba;
+window.getDarkerShade = getDarkerShade;
+window.drawBlueprintGrid = drawBlueprintGrid;
 window.UtilHelpers = {
     hexToRgba,
     getDarkerShade,
     drawBlueprintGrid
-}; 
+};
+
+if (typeof module !== 'undefined') {
+    module.exports = {
+        hexToRgba,
+        getDarkerShade,
+        drawBlueprintGrid
+    };
+}
