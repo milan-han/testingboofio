@@ -10,18 +10,23 @@
     "test:e2e": "playwright test --reporter=line",
     "dev": "vite",
     "build": "vite build",
-    "start": "vite"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "sass": "^1.89.2",
-    "vite": "^7.0.2",
-    "vitest": "^1.5.3",
+    "@playwright/test": "^1.43.1",
     "@testing-library/dom": "^9.3.1",
     "@testing-library/jest-dom": "^6.2.0",
     "jsdom": "^24.0.0",
-    "@playwright/test": "^1.43.1"
+    "sass": "^1.89.2",
+    "vite": "^7.0.2",
+    "vitest": "^1.5.3"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
   }
 }

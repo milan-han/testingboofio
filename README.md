@@ -24,6 +24,13 @@ npm run dev
 ```
 Open your browser at **http://localhost:5173**. Vite will live-reload JS and SCSS as you edit.
 
+### Start the Multiplayer Server
+To experiment with the new WebSocket layer run:
+```bash
+npm start
+```
+This starts an Express + Socket.IO server on **http://localhost:3000** serving the same files with multiplayer sync enabled.
+
 ### One-Click Offline Demo
 If you only need a fast demo with no build tools, simply double-click `index.html`. Most features work, but HMR and Sass compiling are disabled.
 

@@ -196,6 +196,17 @@
             _notify('sandbox_updated');
         },
 
+        /** Replace entire state from network */
+        _applyState(snapshot = {}) {
+            _state.players = Array.isArray(snapshot.players)
+                ? snapshot.players.slice(0, 4)
+                : [];
+            _state.mode = snapshot.mode || _state.mode;
+            Object.assign(_state.settings, snapshot.settings || {});
+            Object.assign(_state.sandbox, snapshot.sandbox || {});
+            _notify('state_synced');
+        },
+
         /* ===== Convenience helpers ===== */
         get players() {
             return RoomState.getState().players;
