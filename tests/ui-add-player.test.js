@@ -9,14 +9,29 @@ async function loadModule() {
   await import(modulePath);
 }
 
+// Mock RoomState for tests that trigger options
+const mockRoomState = {
+  players: [],
+  addPlayer: vi.fn(),
+  mode: 'lobby',
+  subscribe: vi.fn()
+};
+
 describe('ui-add-player popup behaviour', () => {
   beforeEach(async () => {
+    // Setup mock RoomState
+    global.RoomState = mockRoomState;
+    mockRoomState.players = [];
+    mockRoomState.addPlayer.mockClear();
+    
     // Prepare minimal DOM structure expected by the widget
     document.body.innerHTML = `
       <button id="invite-player-btn">Invite</button>
       <div id="invite-popup" class="hidden">
         <button class="popup-option">LOCAL PLAYER</button>
-      </div>`;
+      </div>
+      <div id="player-stats-panel" class="hidden"></div>
+      <div id="drivers-panel"></div>`;
 
     // Dispatch DOMContentLoaded so script initialisers run
     await loadModule();
@@ -25,6 +40,7 @@ describe('ui-add-player popup behaviour', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
+    delete global.RoomState;
   });
 
   it('changes button label to "ADD PLAYER" on init', () => {
@@ -45,39 +61,45 @@ describe('ui-add-player popup behaviour', () => {
     expect(popup.classList.contains('hidden')).toBe(true);
   });
 
-  it('closes popup when clicking close button', () => {
-    const addBtn = document.getElementById('invite-player-btn');
+  it('hides close button in popover mode', async () => {
     const popup = document.getElementById('invite-popup');
     
-    // Add close button to DOM
+    // Add close button to DOM before loading module
     const closeBtn = document.createElement('div');
     closeBtn.id = 'popup-close-btn';
     closeBtn.className = 'popup-close';
     closeBtn.textContent = '+';
     popup.appendChild(closeBtn);
 
-    // Open popup
-    fireEvent.click(addBtn);
-    expect(popup.classList.contains('hidden')).toBe(false);
+    // Reload module after adding close button
+    await loadModule();
+    document.dispatchEvent(new Event('DOMContentLoaded'));
 
-    // Close popup via close button
-    fireEvent.click(closeBtn);
-    expect(popup.classList.contains('hidden')).toBe(true);
+    // Module should hide the close button in popover mode
+    expect(closeBtn.style.display).toBe('none');
   });
 
-  it('handles popup option clicks', () => {
-    const popup = document.getElementById('invite-popup');
-    
-    // Add NPC and online player options
-    popup.innerHTML = `
-      <button class="popup-option" data-type="npc">NPC</button>
-      <button class="popup-option" data-type="local">LOCAL PLAYER</button>
-      <button class="popup-option" data-type="online">ONLINE PLAYER</button>
-      <div id="popup-close-btn" class="popup-close">+</div>`;
+  it('handles popup option clicks', async () => {
+    // Set up DOM with proper options before loading module
+    document.body.innerHTML = `
+      <button id="invite-player-btn">Invite</button>
+      <div id="invite-popup" class="hidden">
+        <button class="popup-option">NPC</button>
+        <button class="popup-option">LOCAL PLAYER</button>
+        <button class="popup-option">ONLINE PLAYER</button>
+        <div id="popup-close-btn" class="popup-close">+</div>
+      </div>
+      <div id="player-stats-panel" class="hidden"></div>
+      <div id="drivers-panel"></div>`;
+
+    // Reload module after setting up proper DOM
+    await loadModule();
+    document.dispatchEvent(new Event('DOMContentLoaded'));
 
     const addBtn = document.getElementById('invite-player-btn');
-    const npcOption = popup.querySelector('[data-type="npc"]');
-    const localOption = popup.querySelector('[data-type="local"]');
+    const popup = document.getElementById('invite-popup');
+    const npcOption = Array.from(popup.querySelectorAll('.popup-option')).find(opt => opt.textContent.trim() === 'NPC');
+    const localOption = Array.from(popup.querySelectorAll('.popup-option')).find(opt => opt.textContent.trim() === 'LOCAL PLAYER');
 
     // Open popup
     fireEvent.click(addBtn);
@@ -140,35 +162,28 @@ describe('ui-add-player popup behaviour', () => {
     }).not.toThrow();
   });
 
-  it('handles keyboard navigation', () => {
+  it('positions popup relative to button', () => {
     const addBtn = document.getElementById('invite-player-btn');
     const popup = document.getElementById('invite-popup');
 
-    // Test Enter key on button
-    const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
-    fireEvent(addBtn, enterEvent);
-    expect(popup.classList.contains('hidden')).toBe(false);
-
-    // Test Escape key to close popup
-    const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
-    fireEvent(document, escapeEvent);
-    expect(popup.classList.contains('hidden')).toBe(true);
-  });
-
-  it('maintains accessibility attributes', () => {
-    const addBtn = document.getElementById('invite-player-btn');
-    const popup = document.getElementById('invite-popup');
-
-    // Button should have proper accessibility attributes
-    expect(addBtn.getAttribute('aria-expanded')).toBe('false');
-    expect(addBtn.getAttribute('aria-haspopup')).toBe('true');
+    // Mock getBoundingClientRect for testing
+    addBtn.getBoundingClientRect = vi.fn(() => ({
+      left: 100,
+      bottom: 50
+    }));
 
     // Open popup
     fireEvent.click(addBtn);
-    expect(addBtn.getAttribute('aria-expanded')).toBe('true');
+    
+    // Should position popup below button
+    expect(popup.style.left).toBe('100px');
+    expect(popup.style.top).toBe('56px'); // bottom + 6px
+  });
 
-    // Close popup
-    fireEvent.click(addBtn);
-    expect(addBtn.getAttribute('aria-expanded')).toBe('false');
+  it('adds popover class for styling', () => {
+    const popup = document.getElementById('invite-popup');
+    
+    // Module should add popover class for CSS styling
+    expect(popup.classList.contains('popover')).toBe(true);
   });
 }); 

@@ -88,7 +88,7 @@ describe('ui-player-cards display and behavior', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     delete global.RoomState;
-    delete global.Node;
+    // Don't delete global.Node - it breaks subsequent tests
   });
 
   it('automatically adds a local player if none exist', () => {

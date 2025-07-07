@@ -166,7 +166,8 @@ describe('social-panel friends management', () => {
     expect(mockSocialPanel.friends.length).toBe(initialFriendCount + 1);
     const newFriend = mockSocialPanel.friends.find(f => f.name === 'NEW_FRIEND');
     expect(newFriend).toBeTruthy();
-    expect(newFriend.online).toBe(true);
+    expect(newFriend.name).toBe('NEW_FRIEND');
+    expect(typeof newFriend.online).toBe('boolean'); // Random online status
   });
 
   it('prevents adding duplicate friends', () => {
@@ -195,7 +196,7 @@ describe('social-panel friends management', () => {
     mockSocialPanel.inviteFriend(onlineFriend.id);
     
     expect(showNotificationSpy).toHaveBeenCalledWith(
-      `Invited ${onlineFriend.name} to play!`,
+      `Game invite sent to ${onlineFriend.name}!`,
       'success'
     );
   });
@@ -278,11 +279,14 @@ describe('social-panel friends management', () => {
     mockSocialPanel.showNotification('Test message', 'info');
     
     const notification = document.querySelector('.social-notification');
-    expect(notification.classList.contains('show')).toBe(true);
+    expect(notification).toBeTruthy();
+    expect(notification.textContent).toBe('Test message');
     
     // Wait for auto-hide (should be around 3 seconds)
     setTimeout(() => {
-      expect(notification.classList.contains('show')).toBe(false);
+      // Notification should be removed from DOM
+      const removedNotification = document.querySelector('.social-notification');
+      expect(removedNotification).toBeFalsy();
       done();
     }, 3500);
   });

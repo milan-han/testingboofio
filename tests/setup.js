@@ -1,4 +1,9 @@
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
+
+// Add Jest compatibility for tests that use jest.fn(), jest.spyOn(), etc.
+global.jest = vi;
+global.spyOn = vi.spyOn;
 
 // Add DOM globals that jsdom doesn't provide by default
 if (typeof window !== 'undefined') {
