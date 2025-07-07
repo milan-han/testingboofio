@@ -8,7 +8,7 @@
  */
 class GameStore {
     constructor() {
-        this.state = {
+        this.initialState = {
             // Game State
             gameState: "setup", // "setup", "countdown", "playing", "goal"
             lapStartTime: Date.now(),
@@ -56,7 +56,10 @@ class GameStore {
             // Countdown
             countdownInterval: null
         };
-        
+
+        // clone to actual state
+        this.state = { ...this.initialState };
+
         this.subscribers = new Map(); // key -> Set of callback functions
         this.globalSubscribers = new Set(); // callbacks that listen to all changes
     }
@@ -68,15 +71,20 @@ class GameStore {
      * @returns {function} Unsubscribe function
      */
     subscribe(keys, callback) {
+        if (keys === '*') {
+            this.globalSubscribers.add(callback);
+            return () => this.globalSubscribers.delete(callback);
+        }
+
         const keyArray = Array.isArray(keys) ? keys : [keys];
-        
+
         keyArray.forEach(key => {
             if (!this.subscribers.has(key)) {
                 this.subscribers.set(key, new Set());
             }
             this.subscribers.get(key).add(callback);
         });
-        
+
         // Return unsubscribe function
         return () => {
             keyArray.forEach(key => {
@@ -125,62 +133,48 @@ class GameStore {
      */
     set(key, value) {
         const updates = typeof key === 'object' ? key : { [key]: value };
-        const changedKeys = [];
-        
+        const changed = [];
+
         Object.entries(updates).forEach(([k, v]) => {
-            if (this.state[k] !== v) {
+            const oldVal = this.state[k];
+            if (oldVal !== v) {
                 this.state[k] = v;
-                changedKeys.push(k);
+                changed.push({ key: k, oldVal, newVal: v });
             }
         });
-        
+
         // Notify subscribers
-        changedKeys.forEach(changedKey => {
+        changed.forEach(({ key: changedKey, oldVal, newVal }) => {
             const callbacks = this.subscribers.get(changedKey);
             if (callbacks) {
                 callbacks.forEach(callback => {
                     try {
-                        callback(this.state[changedKey], changedKey, this.state);
+                        callback(newVal, oldVal);
                     } catch (error) {
                         console.error('Error in state subscriber:', error);
                     }
                 });
             }
-        });
-        
-        // Notify global subscribers
-        if (changedKeys.length > 0) {
+
+            // Notify global subscribers for each key
             this.globalSubscribers.forEach(callback => {
                 try {
-                    callback(this.state, changedKeys);
+                    callback(changedKey, newVal, oldVal);
                 } catch (error) {
                     console.error('Error in global state subscriber:', error);
                 }
             });
-        }
+        });
     }
     
     /**
      * Reset game state to initial values
      */
-    resetGame() {
-        this.set({
-            gameState: "setup",
-            scoreP1: 0,
-            scoreP2: 0,
-            celebrating: false,
-            celebrateTimer: 0,
-            gameSpeed: 1.0,
-            explodedCar: null,
-            celebrationDriver: null,
-            gameTimer: 0,
-            gameStartTime: 0,
-            gameTimeElapsed: 0,
-            gameEnded: false,
-            gamePaused: false,
-            worldOffsetX: 0,
-            worldOffsetY: 0,
-            countdownInterval: null
+    reset() {
+        this.state = { ...this.initialState };
+        // Notify full reset via global subscribers
+        this.globalSubscribers.forEach(cb => {
+            try { cb('reset', null, null); } catch (e) { console.error(e); }
         });
     }
     
@@ -211,9 +205,22 @@ class GameStore {
     startCelebration(car, driver) {
         this.set({
             celebrating: true,
-            celebrateTimer: 1500, // CELEBRATION_MS
-            explodedCar: car,
-            celebrationDriver: driver
+            celebrateTimer: 0,
+            explodedCar: car || null,
+            celebrationDriver: driver || null
+        });
+    }
+
+    /**
+     * End celebration immediately
+     */
+    endCelebration() {
+        this.set({
+            celebrating: false,
+            celebrateTimer: 0,
+            gameSpeed: 1.0,
+            explodedCar: null,
+            celebrationDriver: null
         });
     }
     
@@ -250,4 +257,4 @@ class GameStore {
 const gameStore = new GameStore();
 
 // Export for global access (IIFE pattern for compatibility)
-window.GameStore = gameStore; 
+window.GameStore = gameStore;

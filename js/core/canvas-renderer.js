@@ -2,171 +2,92 @@
  *  Canvas Renderer & Responsive Scaling
  * ================================*/
 
-/**
- * Canvas Renderer class for managing canvas setup and responsive scaling
- */
 class CanvasRenderer {
-    constructor(canvasId = "game") {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext("2d");
-        
-        if (!this.canvas || !this.ctx) {
-            throw new Error(`Canvas element with id "${canvasId}" not found`);
-        }
-        
+    constructor(defaultId = 'gameCanvas') {
+        this.canvasId = defaultId;
+        this.canvas = null;
+        this.ctx = null;
+        this.dpr = 1;
+        this.zoom = 1;
+        this.minZoom = 0.5;
+        this.maxZoom = 3.0;
         this.initialized = false;
-        this.resizeCallbacks = new Set();
-        
-        this.init();
+        this.baseWidth = 960;
+        this.baseHeight = 600;
+        this.currentWidth = this.baseWidth;
+        this.currentHeight = this.baseHeight;
     }
-    
-    /**
-     * Initialize canvas renderer
-     */
-    init() {
-        if (this.initialized) return;
-        
-        // Set up event listeners for responsive scaling
-        this.setupResponsiveScaling();
-        
-        // Apply initial scaling
-        this.applyResponsiveCanvasScaling();
-        
+
+    initCanvas(id = this.canvasId) {
+        this.canvasId = id;
+        this.canvas = document.getElementById(id);
+        if (!this.canvas) {
+            console.warn('Canvas element not found:', id);
+            return;
+        }
+        this.ctx = this.canvas.getContext('2d');
+        this.applyDevicePixelRatio();
         this.initialized = true;
     }
-    
-    /**
-     * Set up responsive scaling event listeners
-     */
-    setupResponsiveScaling() {
-        const handleResize = () => {
-            this.applyResponsiveCanvasScaling();
-            this.notifyResizeCallbacks();
-        };
-        
-        window.addEventListener("resize", handleResize);
-        window.addEventListener("orientationchange", handleResize);
-    }
-    
-    /**
-     * Apply responsive canvas scaling
-     * Scales canvas to fit viewport while maintaining aspect ratio
-     */
-    applyResponsiveCanvasScaling() {
-        const rawScale = Math.min(
-            window.innerWidth  / this.canvas.width,
-            window.innerHeight / this.canvas.height
-        );
 
-        // Determine whether the game is currently zoomed in (match countdown or active)
-        const zoomed = this.canvas.classList.contains("zooming") || 
-                      this.canvas.classList.contains("game-active");
+    applyDevicePixelRatio() {
+        if (!this.ctx) return;
+        this.dpr = window.devicePixelRatio || 1;
+        this.ctx.scale(this.dpr, this.dpr);
+    }
 
-        // Base scale caps
-        const maxScale = zoomed ? 1 : 0.7; // 0.7 for menu, 1 when zoomed
-        const scale = Math.min(rawScale, maxScale);
+    setCanvasDimensions(width, height) {
+        if (!this.canvas) return;
+        this.currentWidth = width;
+        this.currentHeight = height;
+        this.canvas.width = width * this.dpr;
+        this.canvas.height = height * this.dpr;
+        this.canvas.style.width = `${width}px`;
+        this.canvas.style.height = `${height}px`;
+    }
 
-        this.canvas.style.transform = `translate(-50%, -65%) scale(${scale})`;
+    calculateScaleFactor(containerW, containerH, baseW, baseH) {
+        return Math.min(containerW / baseW, containerH / baseH);
     }
-    
-    /**
-     * Get canvas element
-     * @returns {HTMLCanvasElement} Canvas element
-     */
-    getCanvas() {
-        return this.canvas;
+
+    handleResize() {
+        if (!this.canvas) return;
+        const scale = this.calculateScaleFactor(window.innerWidth, window.innerHeight, this.baseWidth, this.baseHeight);
+        const w = Math.round(this.baseWidth * scale);
+        const h = Math.round(this.baseHeight * scale);
+        this.setCanvasDimensions(w, h);
     }
-    
-    /**
-     * Get canvas context
-     * @returns {CanvasRenderingContext2D} Canvas context
-     */
-    getContext() {
-        return this.ctx;
+
+    setZoom(level) {
+        this.zoom = Math.min(this.maxZoom, Math.max(this.minZoom, level));
     }
-    
-    /**
-     * Get canvas dimensions
-     * @returns {object} Width and height
-     */
-    getDimensions() {
-        return {
-            width: this.canvas.width,
-            height: this.canvas.height
-        };
+
+    getZoom() {
+        return this.zoom;
     }
-    
-    /**
-     * Set canvas dimensions
-     * @param {number} width - Canvas width
-     * @param {number} height - Canvas height
-     */
-    setDimensions(width, height) {
-        this.canvas.width = width;
-        this.canvas.height = height;
-        this.applyResponsiveCanvasScaling();
+
+    zoomIn() {
+        this.setZoom(this.zoom * 1.2);
     }
-    
-    /**
-     * Clear the entire canvas
-     */
-    clear() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    zoomOut() {
+        this.setZoom(this.zoom / 1.2);
     }
-    
-    /**
-     * Add callback to be called when canvas resizes
-     * @param {function} callback - Resize callback function
-     * @returns {function} Unsubscribe function
-     */
-    onResize(callback) {
-        this.resizeCallbacks.add(callback);
-        return () => this.resizeCallbacks.delete(callback);
+
+    screenToWorld(x, y) {
+        return { x: x / this.zoom, y: y / this.zoom };
     }
-    
-    /**
-     * Notify all resize callbacks
-     */
-    notifyResizeCallbacks() {
-        this.resizeCallbacks.forEach(callback => {
-            try {
-                callback(this.getDimensions());
-            } catch (error) {
-                console.error('Error in resize callback:', error);
-            }
-        });
+
+    worldToScreen(x, y) {
+        return { x: x * this.zoom, y: y * this.zoom };
     }
-    
-    /**
-     * Add zoom class to canvas
-     */
-    enableZoom() {
-        this.canvas.classList.add("zooming");
-        this.applyResponsiveCanvasScaling();
+
+    getCanvasDimensions() {
+        return { width: this.currentWidth, height: this.currentHeight };
     }
-    
-    /**
-     * Remove zoom class from canvas
-     */
-    disableZoom() {
-        this.canvas.classList.remove("zooming");
-        this.applyResponsiveCanvasScaling();
-    }
-    
-    /**
-     * Add game active class to canvas
-     */
-    setGameActive() {
-        this.canvas.classList.add("game-active");
-        this.applyResponsiveCanvasScaling();
-    }
-    
-    /**
-     * Remove game active class from canvas
-     */
-    setGameInactive() {
-        this.canvas.classList.remove("game-active");
-        this.applyResponsiveCanvasScaling();
+
+    isInitialized() {
+        return this.initialized;
     }
 }
 
@@ -176,6 +97,3 @@ const canvasRenderer = new CanvasRenderer();
 // Export for global access (IIFE pattern for compatibility)
 window.CanvasRenderer = canvasRenderer;
 
-// Provide backward compatibility for existing code
-window.canvas = canvasRenderer.getCanvas();
-window.ctx = canvasRenderer.getContext(); 

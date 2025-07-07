@@ -11,6 +11,8 @@ class ChatUtils {
         if (!this.chatMessages) {
             console.warn('Chat messages element not found');
         }
+        // maximum number of chat messages to keep
+        this.maxMessages = 50;
     }
     
     /**
@@ -20,7 +22,7 @@ class ChatUtils {
      */
     addMessage(type, message) {
         if (!this.chatMessages) return;
-        
+
         const messageDiv = document.createElement('div');
         messageDiv.className = `chat-message ${type}`;
         
@@ -48,9 +50,14 @@ class ChatUtils {
         messageDiv.appendChild(nameSpan);
         messageDiv.appendChild(contentSpan);
         this.chatMessages.appendChild(messageDiv);
-        
-        // Auto-scroll to bottom
-        this.scrollToBottom();
+
+        // enforce maximum message count
+        while (this.chatMessages.childElementCount > this.maxMessages) {
+            this.chatMessages.removeChild(this.chatMessages.firstChild);
+        }
+
+        // Auto-scroll to bottom via scrollIntoView for smoother behavior
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
     
     /**
@@ -63,26 +70,35 @@ class ChatUtils {
     applyMessageStyling(type, nameSpan, contentSpan, messageDiv) {
         if (type === 'self') {
             // Player 1 (self) colors
-            const p1Color = this.getCSSProperty('--player1-color') || '#c62828';
+            const p1Color = (window.player && window.player.color) || this.getCSSProperty('--player1-color') || '#c62828';
             const p1Accent = this.getCSSProperty('--player1-accent') || '#ff5252';
-            
+
             nameSpan.style.color = p1Color;
             contentSpan.style.color = p1Accent;
+            messageDiv.style.color = p1Color;
+            messageDiv.style.textAlign = 'right';
+            messageDiv.style.fontStyle = 'normal';
             messageDiv.style.backgroundColor = this.hexToRgba(p1Color, 0.1);
-            
+
         } else if (type === 'friend') {
             // Player 2 (friend) colors
-            const p2Color = this.getCSSProperty('--player2-color') || '#2962ff';
+            const p2Color = (window.player2 && window.player2.color) || this.getCSSProperty('--player2-color') || '#2962ff';
             const p2Accent = this.getCSSProperty('--player2-accent') || '#448aff';
-            
+
             nameSpan.style.color = p2Color;
             contentSpan.style.color = p2Accent;
+            messageDiv.style.color = p2Color;
+            messageDiv.style.textAlign = 'left';
+            messageDiv.style.fontStyle = 'normal';
             messageDiv.style.backgroundColor = this.hexToRgba(p2Color, 0.1);
-            
+
         } else if (type === 'system') {
             // System message styling
             nameSpan.style.color = '#888';
             contentSpan.style.color = '#aaa';
+            messageDiv.style.color = '#999';
+            messageDiv.style.textAlign = 'center';
+            messageDiv.style.fontStyle = 'italic';
             messageDiv.style.backgroundColor = 'rgba(136, 136, 136, 0.1)';
         }
     }
@@ -93,9 +109,12 @@ class ChatUtils {
      * @returns {string} Property value
      */
     getCSSProperty(property) {
-        return getComputedStyle(document.documentElement)
-            .getPropertyValue(property)
-            .trim();
+        if (typeof document !== 'undefined' && document.documentElement) {
+            return getComputedStyle(document.documentElement)
+                .getPropertyValue(property)
+                .trim();
+        }
+        return '';
     }
     
     /**
