@@ -81,6 +81,7 @@ The `/Guides` directory contains rich Markdown docs to accelerate onboarding:
 | [`UI_LAYOUT_GUIDE.md`](Guides/UI_LAYOUT_GUIDE.md) | ASCII wireframes, CSS hooks, grid recommendations | Editing layout or adding panels |
 | [`STYLE_GUIDE.md`](Guides/STYLE_GUIDE.md) | Colours, typography, spacing, component states, Sass variables | Any time you touch SCSS or visual design |
 | [`TESTING_GUIDE.md`](Guides/TESTING_GUIDE.md) | Vitest/Testing Library/Playwright – writing & running tests | Whenever you add or refactor code |
+| [`COMPONENTS.md`](Guides/COMPONENTS.md) | Detailed breakdown of every UI component, expected behaviours & edge-cases | Any time you touch UI logic or visuals |
 
 All guides are plain Markdown—open them in your IDE, on GitHub, or render with any viewer. Use `⌘F` to jump to keywords like "driver card" or "npc".
 
@@ -104,6 +105,7 @@ All guides are plain Markdown—open them in your IDE, on GitHub, or render with
 1. Create a branch `feat/<your-feature>`
 2. Follow the coding conventions in the Style Guide
 3. Submit a pull request with a clear description of *what* & *why*
+4. If your change affects UI behaviour or components documented in `/Guides`, update the relevant guide (especially `COMPONENTS.md`) in the same PR
 
 PRs that improve documentation, refactor legacy code, or add tests are highly appreciated!
 
