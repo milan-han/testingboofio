@@ -4,7 +4,10 @@
   "description": "This project is a small browser game. Open `index.html` in any modern web browser to start playing.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run test:unit && npm run test:dom && npm run test:e2e",
+    "test:unit": "vitest run --environment node",
+    "test:dom": "vitest run --environment jsdom",
+    "test:e2e": "playwright test --reporter=line",
     "dev": "vite",
     "build": "vite build",
     "start": "vite"
@@ -14,6 +17,11 @@
   "license": "ISC",
   "devDependencies": {
     "sass": "^1.89.2",
-    "vite": "^7.0.2"
+    "vite": "^7.0.2",
+    "vitest": "^1.5.3",
+    "@testing-library/dom": "^9.3.1",
+    "@testing-library/jest-dom": "^6.2.0",
+    "jsdom": "^24.0.0",
+    "@playwright/test": "^1.43.1"
   }
 }

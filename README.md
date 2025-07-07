@@ -80,10 +80,9 @@ The `/Guides` directory contains rich Markdown docs to accelerate onboarding:
 | [`TECHNICAL_OVERVIEW.md`](Guides/TECHNICAL_OVERVIEW.md) | Mermaid architecture diagram, lobby store pattern, file cheat-sheet | Day 1 – grasp the big picture |
 | [`UI_LAYOUT_GUIDE.md`](Guides/UI_LAYOUT_GUIDE.md) | ASCII wireframes, CSS hooks, grid recommendations | Editing layout or adding panels |
 | [`STYLE_GUIDE.md`](Guides/STYLE_GUIDE.md) | Colours, typography, spacing, component states, Sass variables | Any time you touch SCSS or visual design |
+| [`TESTING_GUIDE.md`](Guides/TESTING_GUIDE.md) | Vitest/Testing Library/Playwright – writing & running tests | Whenever you add or refactor code |
 
 All guides are plain Markdown—open them in your IDE, on GitHub, or render with any viewer. Use `⌘F` to jump to keywords like "driver card" or "npc".
-
-
 
 ---
 
@@ -96,6 +95,7 @@ All guides are plain Markdown—open them in your IDE, on GitHub, or render with
 | Add a new colour token | `scss/base/_variables.scss` |
 | Tune NPC difficulty | `js/globals.js` → `npcUpdate()` |
 | Change countdown duration | `js/game-state.js` |
+| Run all tests | `npm test` |
 
 ---
 
