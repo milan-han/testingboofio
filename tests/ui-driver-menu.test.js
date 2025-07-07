@@ -1,4 +1,5 @@
 import { fireEvent } from '@testing-library/dom';
+import { vi } from 'vitest';
 
 // Mock RoomState for testing
 const mockRoomState = {
@@ -61,6 +62,19 @@ async function loadModule() {
   delete (await import.meta).require?.cache?.[modulePath];
   
   await import(modulePath);
+}
+
+// Helper function to normalize color values
+function normalizeColor(color) {
+  // Convert hex to RGB if needed
+  if (color.startsWith('#')) {
+    const r = parseInt(color.slice(1, 3), 16);
+    const g = parseInt(color.slice(3, 5), 16);
+    const b = parseInt(color.slice(5, 7), 16);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+  // Already RGB format
+  return color.replace(/\s/g, '');
 }
 
 describe('ui-driver-menu team management', () => {
@@ -136,7 +150,7 @@ describe('ui-driver-menu team management', () => {
     const team1Zone = document.getElementById('team1-zone');
     const npcCard = team1Zone.querySelector('.driver-card');
     
-    expect(npcCard.style.color).toBe('#ff5722');
+    expect(normalizeColor(npcCard.style.color)).toBe(normalizeColor('#ff5722'));
   });
 
   it('makes cards draggable', () => {
@@ -195,7 +209,7 @@ describe('ui-driver-menu team management', () => {
   });
 
   it('opens NPC editor when NPC card is clicked', () => {
-    global.prompt = jest.fn()
+    global.prompt = vi.fn()
       .mockReturnValueOnce('NEW_BOT_NAME')
       .mockReturnValueOnce('#00ff00');
     
@@ -336,5 +350,17 @@ describe('ui-driver-menu team management', () => {
         { id: '1', type: 'local', name: 'PLAYER 1', team: 1, ready: false }
       ]);
     }).not.toThrow();
+  });
+
+  it('applies ready style to team zone', () => {
+    const team1Zone = document.getElementById('team1-zone');
+    const styleEl = document.createElement('style');
+    styleEl.textContent = '.team-dropzone.ready { border: 2px solid #4caf50; }';
+    document.head.appendChild(styleEl);
+    
+    team1Zone.classList.add('ready');
+    
+    const computedStyle = getComputedStyle(team1Zone);
+    expect(normalizeColor(computedStyle.borderColor)).toBe(normalizeColor('#4caf50'));
   });
 }); 

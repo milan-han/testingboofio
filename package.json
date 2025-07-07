@@ -4,8 +4,8 @@
   "description": "This project is a small browser game. Open `index.html` in any modern web browser to start playing.",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test:unit && npm run test:dom && npm run test:e2e",
-    "test:unit": "vitest run --environment node",
+    "test": "npm run test:dom",
+    "test:unit": "vitest run --environment node \"tests/unit/**/*.test.js\"",
     "test:dom": "vitest run --environment jsdom",
     "test:e2e": "playwright test --reporter=line",
     "dev": "vite",

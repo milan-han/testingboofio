@@ -1,21 +1,15 @@
 import { fireEvent } from '@testing-library/dom';
+import { vi } from 'vitest';
+import { SocialPanel } from '../js/social-panel.js';
 
 // Mock global socialPanel instance that would be created by the module
 let mockSocialPanel;
 
 // Helper to load the module and create SocialPanel instance
 async function loadModule() {
-  // Clear module cache if it exists
-  const modulePath = '../js/social-panel.js';
-  delete (await import.meta).require?.cache?.[modulePath];
-  
-  // Since the SocialPanel is a class defined in a non-module script,
-  // we need to load it into the global scope first
-  await import(modulePath);
-  
-  // Create instance - SocialPanel should now be available globally
+  // Create instance
   mockSocialPanel = new SocialPanel();
-  global.socialPanel = mockSocialPanel;
+  window.socialPanel = mockSocialPanel;
   
   return mockSocialPanel;
 }
@@ -57,7 +51,7 @@ describe('social-panel friends management', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    delete global.socialPanel;
+    delete window.socialPanel;
     mockSocialPanel = null;
   });
 
@@ -196,7 +190,7 @@ describe('social-panel friends management', () => {
   it('invites friend and shows notification', () => {
     const onlineFriend = mockSocialPanel.friends.find(f => f.online);
     
-    const showNotificationSpy = jest.spyOn(mockSocialPanel, 'showNotification');
+    const showNotificationSpy = vi.spyOn(mockSocialPanel, 'showNotification');
     
     mockSocialPanel.inviteFriend(onlineFriend.id);
     
@@ -209,8 +203,7 @@ describe('social-panel friends management', () => {
   it('handles add friend input events', () => {
     const addFriendInput = document.getElementById('addFriendInput');
     
-    // Mock the showSuggestions method
-    const showSuggestionsSpy = jest.spyOn(mockSocialPanel, 'showSuggestions');
+    const showSuggestionsSpy = vi.spyOn(mockSocialPanel, 'showSuggestions');
     
     // Simulate typing
     addFriendInput.value = 'test';
@@ -221,7 +214,7 @@ describe('social-panel friends management', () => {
 
   it('handles Enter key to add friend', () => {
     const addFriendInput = document.getElementById('addFriendInput');
-    const addFriendSpy = jest.spyOn(mockSocialPanel, 'addFriend');
+    const addFriendSpy = vi.spyOn(mockSocialPanel, 'addFriend');
     
     addFriendInput.value = 'TEST_FRIEND';
     
@@ -233,7 +226,7 @@ describe('social-panel friends management', () => {
 
   it('handles Escape key to cancel add friend', () => {
     const addFriendInput = document.getElementById('addFriendInput');
-    const cancelSpy = jest.spyOn(mockSocialPanel, 'cancelAddFriend');
+    const cancelSpy = vi.spyOn(mockSocialPanel, 'cancelAddFriend');
     
     const escapeEvent = new KeyboardEvent('keypress', { key: 'Escape' });
     fireEvent(addFriendInput, escapeEvent);
@@ -309,7 +302,7 @@ describe('social-panel friends management', () => {
 
   it('handles clicking on suggestion to add friend', () => {
     const suggestionsContainer = document.getElementById('friendSuggestions');
-    const addFriendSpy = jest.spyOn(mockSocialPanel, 'addFriendByName');
+    const addFriendSpy = vi.spyOn(mockSocialPanel, 'addFriendByName');
     
     // Show suggestions first
     mockSocialPanel.showSuggestions('BOOST');
@@ -323,7 +316,7 @@ describe('social-panel friends management', () => {
   });
 
   it('closes dropdown when clicking outside', () => {
-    const cancelSpy = jest.spyOn(mockSocialPanel, 'cancelAddFriend');
+    const cancelSpy = vi.spyOn(mockSocialPanel, 'cancelAddFriend');
     
     // Open dropdown
     mockSocialPanel.toggleAddFriendMode();
@@ -336,7 +329,7 @@ describe('social-panel friends management', () => {
 
   it('does not close dropdown when clicking inside social panel', () => {
     const socialPanel = document.getElementById('socialPanel');
-    const cancelSpy = jest.spyOn(mockSocialPanel, 'cancelAddFriend');
+    const cancelSpy = vi.spyOn(mockSocialPanel, 'cancelAddFriend');
     
     // Open dropdown
     mockSocialPanel.toggleAddFriendMode();
