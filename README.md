@@ -31,6 +31,10 @@ npm start
 ```
 This starts an Express + Socket.IO server on **http://localhost:3000** serving the same files with multiplayer sync enabled.
 
+### Custom Room Links
+Click **CUSTOMPLAY** in the game menu to generate a private room.
+Share the URL with `?room=<id>` so a friend can join directly and play in real-time.
+
 ### One-Click Offline Demo
 If you only need a fast demo with no build tools, simply double-click `index.html`. Most features work, but HMR and Sass compiling are disabled.
 

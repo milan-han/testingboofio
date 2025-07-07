@@ -17,10 +17,25 @@
         const playerStatsPanel = document.getElementById('player-stats-panel');
         const driversPanel = document.getElementById('drivers-panel');
         const startButton = document.querySelector('.panel-start');
+        const roomLinkDisplay = document.getElementById('roomLinkDisplay');
+        const roomLinkText = document.getElementById('roomLinkText');
 
         // Current menu state
         let currentMenuMode = 'quickplay'; // 'quickplay' or 'customplay'
         let hasPlayer2 = false;
+
+        function makeRoomId() {
+            return Math.random().toString(36).slice(2, 8);
+        }
+
+        function showRoomLink(id) {
+            if (!roomLinkDisplay || !roomLinkText) return;
+            const url = new URL(window.location.href);
+            url.searchParams.set('room', id);
+            history.replaceState(null, '', url.toString());
+            roomLinkText.textContent = url.toString();
+            roomLinkDisplay.classList.remove('hidden');
+        }
 
         // Toggle between Quick Play and Custom Play
         quickplayBtn && quickplayBtn.addEventListener('click', () => {
@@ -38,6 +53,13 @@
                 window.currentMode = 'matchmaking'; // Online mode
             }
 
+            if (window.RoomState && RoomState.setMode) {
+                RoomState.setMode('quickplay');
+            }
+            if (window.Network && Network.joinQuickplay) {
+                Network.joinQuickplay();
+            }
+            if (roomLinkDisplay) roomLinkDisplay.classList.add('hidden');
             updateStartButton();
         });
 
@@ -51,6 +73,14 @@
 
             // Always local mode for custom play
             window.currentMode = 'npc';
+            if (window.RoomState && RoomState.setMode) {
+                RoomState.setMode('custom');
+            }
+            if (window.Network && Network.joinRoom) {
+                const id = makeRoomId();
+                Network.joinRoom(id);
+                showRoomLink(id);
+            }
             updateStartButton();
         });
 
@@ -202,6 +232,7 @@
 
         // Initialize
         updateStartButton();
+        if (roomLinkDisplay) roomLinkDisplay.classList.add('hidden');
         initializeDragAndDrop();
     });
 

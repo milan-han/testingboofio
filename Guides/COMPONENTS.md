@@ -38,8 +38,9 @@ Edge-cases:
 * Attempts to add an NPC in this mode are blocked with a console warning.
 
 ### Customplay (`#customplayBtn`)
-Purpose: unlock full lobby configuration (local, online, NPC).  
+Purpose: unlock full lobby configuration (local, online, NPC).
 Flow: sets `RoomState.mode = 'custom'` and re-enables all Add-Player options.
+Selecting this now creates a new `roomId`, updates the URL, and shows a copyable link for friends.
 
 ### Mode Toggles (`#mode1v1`, `#mode2v2`)
 Select desired team size *after* choosing Customplay.
@@ -189,6 +190,7 @@ Slides in from the right once `GameState.phase === 'ended'`.
 The **Copy Link** option shares a URL containing the `roomId`. Visiting the link:
 * Automatically attempts to join if the room is **not full**.
 * Redirects to a "Room Full" fallback page otherwise.
+* The menu detects `?room=` on load and calls `Network.joinRoom` automatically.
 
 ---
 
