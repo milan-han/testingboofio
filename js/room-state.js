@@ -196,6 +196,17 @@
             _notify('sandbox_updated');
         },
 
+        /** Replaces entire state from network snapshot */
+        replaceState(newState = {}) {
+            _state.players = Array.isArray(newState.players)
+                ? newState.players.map(p => ({ ...p }))
+                : [];
+            _state.mode = newState.mode || 'custom';
+            _state.settings = Object.assign({}, _state.settings, newState.settings);
+            _state.sandbox = Object.assign({}, _state.sandbox, newState.sandbox);
+            _notify('state_synced');
+        },
+
         /* ===== Convenience helpers ===== */
         get players() {
             return RoomState.getState().players;
@@ -212,4 +223,7 @@
 
     // Expose globally
     global.RoomState = RoomState;
-})(window); 
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = RoomState;
+    }
+})(typeof window !== 'undefined' ? window : globalThis);
