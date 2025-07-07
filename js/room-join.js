@@ -8,6 +8,15 @@
                 window.RoomState.setMode('custom');
             }
             window.Network.joinRoom(roomId);
+            if (typeof window.setPlayer2Type === 'function') {
+                window.setPlayer2Type('human');
+            } else {
+                window.player2IsNPC = false;
+            }
+            const btn = document.getElementById('customplay-btn');
+            if (btn && !btn.classList.contains('active')) {
+                btn.click();
+            }
         }
     });
 })();

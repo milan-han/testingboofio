@@ -81,6 +81,9 @@
                 Network.joinRoom(id);
                 showRoomLink(id);
             }
+            if (typeof setPlayer2Type === 'function') {
+                setPlayer2Type('human');
+            }
             updateStartButton();
         });
 

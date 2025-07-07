@@ -41,6 +41,7 @@ async function setup() {
   global.pointsToWin = 5;
   global.matchTimeMinutes = 5;
   global.Network = { joinRoom: vi.fn(), joinQuickplay: vi.fn() };
+  global.setPlayer2Type = vi.fn();
   await import('../../js/ui-game-menu.js');
   document.dispatchEvent(new Event('DOMContentLoaded'));
 }
@@ -113,6 +114,7 @@ describe('ui-game-menu', () => {
     customBtn.click();
     expect(global.Network.joinRoom).toHaveBeenCalled();
     expect(document.getElementById('roomLinkDisplay').classList.contains('hidden')).toBe(false);
+    expect(global.setPlayer2Type).toHaveBeenCalledWith('human');
   });
 
   it('auto joins room from URL', async () => {
@@ -121,8 +123,10 @@ describe('ui-game-menu', () => {
     Object.defineProperty(window, 'location', { value: url, writable: true });
     document.body.innerHTML = `<div id="gameMenuContainer"></div>`;
     global.Network = { joinRoom: vi.fn(), joinQuickplay: vi.fn() };
+    global.setPlayer2Type = vi.fn();
     await import('../../js/room-join.js');
     document.dispatchEvent(new Event('DOMContentLoaded'));
     expect(global.Network.joinRoom).toHaveBeenCalledWith('xyz');
+    expect(global.setPlayer2Type).toHaveBeenCalledWith('human');
   });
 });
