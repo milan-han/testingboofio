@@ -386,4 +386,13 @@ style.textContent = `
         }
     }
 `;
-document.head.appendChild(style); 
+document.head.appendChild(style);
+
+// Export functions for tests
+if (typeof module !== 'undefined') {
+    module.exports = {
+        addFriend,
+        toggleAddFriendMode,
+        cancelAddFriend
+    };
+}
