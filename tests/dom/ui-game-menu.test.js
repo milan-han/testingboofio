@@ -31,6 +31,7 @@ async function setup() {
         <div id="team2-zone" class="team-dropzone"></div>
       </div>
       <button class="panel-start">PRESS F TO PLAY</button>
+      <div id="roomLinkDisplay" class="hidden"><span id="roomLinkText"></span></div>
     </div>
     <canvas id="game" width="960" height="600"></canvas>`;
 
@@ -39,6 +40,8 @@ async function setup() {
   global.gameType = 'points';
   global.pointsToWin = 5;
   global.matchTimeMinutes = 5;
+  global.Network = { joinRoom: vi.fn(), joinQuickplay: vi.fn() };
+  global.setPlayer2Type = vi.fn();
   await import('../../js/ui-game-menu.js');
   document.dispatchEvent(new Event('DOMContentLoaded'));
 }
@@ -104,5 +107,26 @@ describe('ui-game-menu', () => {
     startBtn.click();
     expect(document.getElementById('gameMenuContainer').classList.contains('hidden')).toBe(true);
     expect(global.initiateCountdown).toHaveBeenCalled();
+  });
+
+  it('creates room and shows link on customplay', () => {
+    const customBtn = document.getElementById('customplay-btn');
+    customBtn.click();
+    expect(global.Network.joinRoom).toHaveBeenCalled();
+    expect(document.getElementById('roomLinkDisplay').classList.contains('hidden')).toBe(false);
+    expect(global.setPlayer2Type).toHaveBeenCalledWith('human');
+  });
+
+  it('auto joins room from URL', async () => {
+    vi.resetModules();
+    const url = new URL('http://localhost/?room=xyz');
+    Object.defineProperty(window, 'location', { value: url, writable: true });
+    document.body.innerHTML = `<div id="gameMenuContainer"></div>`;
+    global.Network = { joinRoom: vi.fn(), joinQuickplay: vi.fn() };
+    global.setPlayer2Type = vi.fn();
+    await import('../../js/room-join.js');
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+    expect(global.Network.joinRoom).toHaveBeenCalledWith('xyz');
+    expect(global.setPlayer2Type).toHaveBeenCalledWith('human');
   });
 });
