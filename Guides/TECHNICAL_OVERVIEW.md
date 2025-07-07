@@ -91,6 +91,12 @@ function onPressF() {
 * Difficulty (`npcLevel`) is set per-bot via the *card* editor or the legacy dropdown.
 * NPC banter lines arrays (`npcScoredLines`, `playerScoredLines`, etc.) feed `npcSay()` which pushes chat messages.
 
+### Social Panel & Friend Management
+
+* `social-panel.js` powers the **Friends** panel seen on the title screen.
+* Supports adding/removing friends, basic invite flow and status updates.
+* Layout shifts when the add–friend dropdown expands.
+
 ### Mode Restrictions
 
 | Condition | Enforced In | Behaviour |
@@ -111,6 +117,8 @@ function onPressF() {
 | `js/ui-driver-menu.js` | Team assignment, ready decals, leave room. |
 | `js/ui-chat-toggle.js` | Auto-hides chat for splitscreen locals. |
 | `js/globals.js` | Massive legacy file: input handling, Press-F logic, NPC AI. |
+| `js/social-panel.js` | Friends list UI, add/remove/invite logic. |
+| `js/field.js` | Draws the field & preview canvas. |
 | `js/game-state.js` | Runs countdown & transitions between `setup`/`playing`/`ended`. |
 
 ---
