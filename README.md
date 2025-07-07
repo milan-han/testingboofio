@@ -24,6 +24,12 @@ npm run dev
 ```
 Open your browser at **http://localhost:5173**. Vite will live-reload JS and SCSS as you edit.
 
+### Start the WebSocket Server
+```bash
+npm run server
+```
+This syncs lobby state between all connected browsers via `ws://localhost:3000`.
+
 ### One-Click Offline Demo
 If you only need a fast demo with no build tools, simply double-click `index.html`. Most features work, but HMR and Sass compiling are disabled.
 
