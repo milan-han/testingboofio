@@ -1,0 +1,81 @@
+$spaces: (
+  0: 0,
+  1: .25rem,
+  2: .5rem,
+  3: .75rem,
+  4: 1rem,
+  5: 1.5rem,
+  6: 2rem,
+  7: 3rem,
+  8: 4rem,
+);
+
+:root {
+  @each $i, $val in $spaces {
+    --space-#{$i}: #{$val};
+  }
+
+  // Background Colors
+  --color-bg: #050510;
+  --color-panel-bg: #111418;
+  
+  // Accent Colors
+  --color-accent: #c62828;
+  --color-border: #666666;
+  
+  // Semantic Colors
+  --color-success: #4caf50;
+  --color-warning: #ff9800;
+  --color-error: #f44336;
+  --color-info: #2196f3;
+  
+  // Text Colors
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-text-muted: #888888;
+  
+  // Button Colors
+  --btn-default-bg: #666666;
+  --btn-default-border: #333333;
+  --btn-hover-bg: #c62828;
+  --btn-active-bg: #555555;
+  
+  // Panel Colors
+  --panel-shadow: #333333;
+  --panel-highlight: rgba(255, 255, 255, 0.1);
+  
+  // Font Sizes
+  --font-size-xs: 7px;
+  --font-size-sm: 8px;
+  --font-size-base: 10px;
+  --font-size-md: 12px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  
+  // Text Shadows
+  --text-shadow-default: 1px 1px 0px #000000;
+  --text-shadow-raised: 2px 2px 0px #ffffff;
+  --text-shadow-deep: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  
+  // Animation Timing
+  --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0.0, 1, 1);
+  --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+  
+  // Animation Duration
+  --duration-fast: 0.1s;
+  --duration-normal: 0.2s;
+  --duration-slow: 0.3s;
+  --duration-extra-slow: 0.5s;
+  
+  // Player colors from legacy
+  --player1-color: #c62828;
+  --player1-accent: #ff5252;
+  --player2-color: #2962ff;
+  --player2-accent: #448aff;
+}
+
+// Breakpoints
+$bp-sm: 48rem;
+$bp-md: 64rem;
+$bp-lg: 80rem;

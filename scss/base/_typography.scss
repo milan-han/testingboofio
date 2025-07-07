@@ -1,0 +1,19 @@
+/* Basic typography scale and defaults */
+html {
+  font-size: 100%;
+}
+
+body {
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  color: #ffffff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 var(--space-4);
+  font-weight: normal;
+}
+
+p {
+  margin: 0 0 var(--space-4);
+}

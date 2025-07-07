@@ -1,0 +1,347 @@
+/* Social Panel component - Retro friends display */
+
+.social-panel {
+  position: absolute;
+  bottom: 450px;
+  right: 20px;
+  width: 280px;
+  height: 220px;
+  background: #111418;
+  border: 3px solid #444;
+  padding: 12px;
+  z-index: 13;
+  box-shadow: 4px 4px 0px #333333;
+  font-family: "Press Start 2P", monospace;
+  transition: height 0.3s ease;
+  
+  &.expanded {
+    height: 300px;
+  }
+}
+
+.social-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #333;
+}
+
+.social-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.social-title {
+  color: #ffffff;
+  font-size: 10px;
+  text-shadow: 1px 1px 0px #000000;
+}
+
+.social-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid #333;
+  position: relative;
+  
+  &.online {
+    background: #00ff00;
+    box-shadow: 0 0 6px #00ff00;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 4px;
+      background: #00ff00;
+      border-radius: 50%;
+      animation: pulse-green 2s infinite;
+    }
+  }
+  
+  &.offline {
+    background: #333;
+    border-color: #666;
+  }
+}
+
+.status-text {
+  color: #cccccc;
+  font-size: 6px;
+}
+
+.friends-container {
+  height: 170px;
+  position: relative;
+}
+
+.friends-list {
+  height: 100%;
+  overflow-y: auto;
+  
+  /* Custom scrollbar for retro look */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #222;
+    border: 1px solid #333;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #555;
+    border: 1px solid #333;
+    
+    &:hover {
+      background: #666;
+    }
+  }
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  margin-bottom: 2px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #2a2a2a;
+    border-color: #555;
+  }
+}
+
+.friend-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.friend-name {
+  color: #ffffff;
+  font-size: 7px;
+  text-shadow: 1px 1px 0px #000000;
+}
+
+.friend-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.friend-action-btn {
+  background: #444;
+  color: #fff;
+  border: 1px solid #666;
+  padding: 2px 4px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #555;
+  }
+  
+  &.invite-btn {
+    background: #c62828;
+    border-color: #a00;
+    
+    &:hover {
+      background: #d32f2f;
+    }
+  }
+}
+
+/* Add friend icon button - positioned next to FRIENDS text */
+.add-friend-icon-btn {
+  width: 16px;
+  height: 16px;
+  background: #666;
+  border: 1px solid #444;
+  padding: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    background: #c62828;
+    border-color: #a00;
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0px #333;
+  }
+  
+  &:active {
+    transform: translate(0, 0);
+    box-shadow: 1px 1px 0px #333;
+  }
+  
+  &.active {
+    background: #c62828;
+    border-color: #a00;
+  }
+  
+  img {
+    width: 10px;
+    height: 10px;
+    filter: brightness(0) invert(1); /* Make icon white */
+  }
+}
+
+/* Add friend dropdown container */
+.add-friend-dropdown {
+  display: none;
+  padding: 8px;
+  background: #0a0a0a;
+  border: 1px solid #333;
+  margin-bottom: 8px;
+  border-radius: 2px;
+  
+  &.show {
+    display: block;
+  }
+}
+
+.add-friend-input-container {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.add-friend-input {
+  flex: 1;
+  background: #000;
+  color: #fff;
+  border: 2px solid #666;
+  padding: 4px 6px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  outline: none;
+  
+  &:focus {
+    border-color: #c62828;
+    box-shadow: 0 0 4px rgba(198, 40, 40, 0.3);
+  }
+  
+  &::placeholder {
+    color: #666;
+  }
+}
+
+.add-friend-btn {
+  background: #c62828;
+  color: #fff;
+  border: 2px solid #a00;
+  padding: 4px 8px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #d32f2f;
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0px #333;
+  }
+  
+  &:active {
+    transform: translate(0, 0);
+    box-shadow: 1px 1px 0px #333;
+  }
+}
+
+.cancel-add-btn {
+  background: #666;
+  color: #fff;
+  border: 2px solid #444;
+  padding: 4px 8px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #777;
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0px #333;
+  }
+  
+  &:active {
+    transform: translate(0, 0);
+    box-shadow: 1px 1px 0px #333;
+  }
+}
+
+.friend-suggestions {
+  max-height: 60px;
+  overflow-y: auto;
+  background: #111418;
+  border: 1px solid #444;
+  display: none;
+  
+  &.show {
+    display: block;
+  }
+}
+
+.suggestion-item {
+  padding: 4px 8px;
+  background: #222;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: #333;
+    border-color: #555;
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.suggestion-name {
+  color: #ccc;
+  font-size: 6px;
+}
+
+/* Animations */
+@keyframes pulse-green {
+  0%, 100% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .social-panel {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin: 10px 0;
+  }
+} 

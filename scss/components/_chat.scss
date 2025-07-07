@@ -1,0 +1,103 @@
+/* Chat Panel styles migrated from legacy partial */
+.chat-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 300px;
+  height: 400px;
+  background: #050510;
+  border: 3px solid #666666;
+  border-bottom: none;
+  border-left: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.8s ease-out;
+}
+
+.chat-panel.compressed {
+  width: 240px;
+  height: 250px;
+  left: 10px;
+  background: rgba(5, 5, 16, 0.7);
+}
+
+.chat-panel.compressed .chat-header {
+  background: rgba(102, 102, 102, 0.8);
+}
+
+.chat-panel.compressed .chat-messages {
+  background: rgba(17, 17, 17, 0.8);
+}
+
+.chat-panel.compressed .chat-input-area {
+  background: rgba(5, 5, 16, 0.8);
+}
+
+.chat-header {
+  background: #666666;
+  color: #ffffff;
+  padding: 8px;
+  font-size: 10px;
+  text-align: center;
+  border-bottom: 2px solid #333333;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background: #111111;
+}
+
+.chat-message {
+  margin-bottom: 8px;
+  font-size: 8px;
+  line-height: 1.2;
+}
+
+.chat-message.system {
+  color: #cccccc;
+  font-style: italic;
+}
+
+.chat-message.friend {
+  color: var(--player2-accent);
+  background: rgba(41, 98, 255, 0.1);
+}
+
+.chat-message.self {
+  color: var(--player1-accent);
+  background: rgba(198, 40, 40, 0.1);
+}
+
+.chat-input-area {
+  padding: 8px;
+  border-top: 2px solid #333333;
+  background: #000000;
+}
+
+.chat-prompt {
+  color: #666666;
+  font-size: 8px;
+  margin-bottom: 4px;
+}
+
+.chat-input {
+  width: 100%;
+  background: #111111;
+  border: 2px solid #333333;
+  color: #ffffff;
+  padding: 4px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+}
+
+.chat-input:focus {
+  outline: 2px solid var(--player1-color);
+}
+
+/* Local-mode override */
+.local-mode .chat-panel {
+  display: none;
+}

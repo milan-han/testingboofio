@@ -1,0 +1,93 @@
+/* ===== Feature Placeholder Box Component ===== */
+.feature-placeholder {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 4rem);
+  max-width: 800px;
+  height: 250px;
+  background: #c62828;
+  border: 3px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+  }
+}
+
+.feature-placeholder__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 20px;
+}
+
+.feature-placeholder__message {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1px;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-placeholder__button {
+  /* The START MATCH button anchored at bottom */
+  position: relative;
+  z-index: 3;
+  margin-bottom: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .feature-placeholder {
+    position: static;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    padding: 25px;
+    margin: 10px 0;
+    left: auto;
+    
+    /* Adjust for mobile grid layout */
+    grid-area: controls;
+    justify-self: stretch;
+  }
+  
+  .feature-placeholder__message {
+    font-size: 10px;
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .feature-placeholder {
+    height: auto;
+    padding: 20px;
+  }
+  
+  .feature-placeholder__message {
+    font-size: 8px;
+    margin-bottom: 12px;
+  }
+} 

@@ -1,0 +1,74 @@
+@use "../base/variables" as *;
+
+.layout-grid {
+  display: grid;
+  grid-template-areas:
+    "header  header  header"
+    "left    main    right"
+    "footer  footer  footer";
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(14rem, 18rem) 1fr minmax(14rem, 18rem);
+  gap: var(--space-4);
+  height: 100vh;
+}
+
+@media (max-width: $bp-md) {
+  .layout-grid {
+    grid-template-areas:
+      "header"
+      "main"
+      "left"
+      "right"
+      "footer";
+    grid-template-columns: 1fr;
+  }
+}
+
+.layout--wide {
+  grid-template-columns: 22rem 1fr 22rem;
+}
+
+.layout--no-sidebar {
+  .site-sidebar {
+    display: none;
+  }
+
+  .site-main {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Legacy selectors mapped into grid areas */
+.layout-grid {
+  /* Header */
+  .logo-container,
+  .login-btn {
+    grid-area: header;
+  }
+
+  /* Left sidebar */
+  .chat-panel,
+  .retro-player {
+    grid-area: left;
+  }
+
+  /* Main canvas and overlays */
+  #game,
+  .countdown-overlay,
+  .pause-overlay,
+  .game-end-overlay {
+    grid-area: main;
+  }
+
+  /* Right sidebar */
+  .multiplayer-panel,
+  .player-card {
+    grid-area: right;
+  }
+
+  /* Footer */
+  .start-game-button,
+  .scoreboard {
+    grid-area: footer;
+  }
+}

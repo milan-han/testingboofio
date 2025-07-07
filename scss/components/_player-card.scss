@@ -1,0 +1,360 @@
+/* Player Card component styles migrated from legacy partial */
+
+.player-card {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 280px;
+  height: 420px;
+  background: #111418;
+  border: 4px solid #666666;
+  box-shadow: 4px 4px 0 #000;
+  padding: 10px 10px 14px 10px;
+  z-index: 14;
+
+  &.player-2 {
+    display: none; // hidden by default (shown in local-mode)
+    
+    .player-card-header {
+      background: #2962ff;
+    }
+  }
+}
+
+/* Card header with editable name */
+.player-card-header {
+  background: #c62828;
+  color: #ffffff;
+  text-align: center;
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+  padding: 4px 2px;
+  margin-bottom: 6px;
+  border-bottom: 2px solid #333;
+  cursor: pointer;
+  position: relative;
+  min-height: 24px;
+  line-height: 12px;
+
+  &:hover {
+    filter: brightness(85%);
+  }
+}
+
+/* Canvas previews inside card */
+#playerCardCanvas,
+#player2CardCanvas {
+  background: transparent;
+  display: block;
+  margin: 0 auto;
+  image-rendering: pixelated;
+  width: 240px;
+  height: 320px;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Local-mode layout modifiers */
+.local-mode {
+  .player-card {
+    &.player-1 {
+      left: 20px;
+      right: auto;
+    }
+    &.player-2 {
+      right: 20px;
+      display: block; // show both cards
+    }
+  }
+
+  .retro-player {
+    bottom: 480px;
+  }
+}
+
+/* Inline editable name input */
+.player-name-input {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Dropdown for selecting NPC difficulty / other options on player 2 */
+.player-dropdown {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #ffffff;
+  cursor: pointer;
+  display: none;
+}
+
+.player-card.player-2 .player-dropdown {
+  display: block;
+}
+
+.player-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #111418;
+  border: 2px solid #666666;
+  border-top: none;
+  min-width: 120px;
+  z-index: 100;
+  display: none;
+
+  &.show {
+    display: block;
+  }
+}
+
+.dropdown-option {
+  padding: 8px 12px;
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #333;
+
+  &:hover {
+    background: #333;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+/* NPC difficulty button set */
+.npc-difficulty-buttons {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  gap: 4px;
+
+  &.show {
+    display: flex;
+  }
+}
+
+.difficulty-btn {
+  background: #666666;
+  color: #ffffff;
+  border: 1px solid #333333;
+  padding: 4px 8px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  cursor: pointer;
+  min-width: 20px;
+  text-align: center;
+
+  &:hover {
+    background: #888888;
+  }
+
+  &.active {
+    background: #2962ff;
+    border-color: #1976d2;
+  }
+}
+
+/* Game-type/points/time selectors (shared with multiplayer panel) */
+.game-type-selector,
+.points-selector,
+.time-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.game-type-btn,
+.points-btn,
+.time-btn {
+  background: #444444;
+  color: #ffffff;
+  border: 2px solid #666666;
+  padding: 6px 12px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  cursor: pointer;
+  text-shadow: 1px 1px 0px #000000;
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0px #333333;
+  min-width: 50px;
+  text-align: center;
+
+  &:hover {
+    background: #666666;
+    box-shadow: 3px 3px 0px #333333;
+    transform: translate(-1px, -1px);
+  }
+
+  &.active {
+    background: #c62828; // for game-type
+    color: #ffffff;
+    border-color: #8b0000;
+  }
+}
+
+/* points & time specific btn overrides */
+.points-btn,
+.time-btn {
+  &.active {
+    background: #2962ff;
+    border-color: #1976d2;
+  }
+}
+
+/* Color selector */
+.color-selector {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 15;
+}
+
+.color-option {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 3px 3px 0px #000000;
+
+  &:hover {
+    box-shadow: 4px 4px 0px #000000;
+    transform: translate(-1px, -1px);
+  }
+
+  &.selected {
+    box-shadow: 2px 2px 0px #000000;
+    transform: translate(1px, 1px);
+
+    &::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 12px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  &.unavailable {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(60%);
+  }
+}
+
+/* Shared panel styles (used by both multiplayer panel and player card) */
+.panel-title {
+  color: #666666;
+  font-size: 12px;
+  text-shadow: 1px 1px 0px #000000;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.panel-row {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-label {
+  color: #ffffff;
+  font-size: 10px;
+  text-shadow: 2px 2px 0px #000000;
+  min-width: 80px;
+  font-weight: bold;
+}
+
+/* NPC-related shared styles */
+.npc-button {
+  background: #666666;
+  color: #ffffff;
+  border: 2px solid #333333;
+  padding: 6px 12px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  cursor: pointer;
+  text-shadow: 1px 1px 0px #000000;
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0px #333333;
+
+  &:hover {
+    background: #c62828;
+    color: #ffffff;
+    box-shadow: 3px 3px 0px #333333;
+    transform: translate(-1px, -1px);
+  }
+}
+
+.npc-select {
+  background: #050510;
+  color: #ffffff;
+  border: 2px solid #666666;
+  padding: 4px 8px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  text-shadow: none;
+
+  option {
+    background: #050510;
+    color: #ffffff;
+  }
+}
+
+.npc-panel {
+  display: none;
+}
+
+/* Game type button specific styling */
+.game-type-btn {
+  flex: 1;
+  min-width: 70px;
+}
+
+.points-btn {
+  min-width: 35px;
+  padding: 6px 8px;
+}
+
+.time-btn {
+  min-width: 60px;
+  font-size: 7px;
+}
+
+/* Position adjustment for NPC buttons when color selector is present */
+.player-card.player-2 .npc-difficulty-buttons {
+  bottom: 48px;
+}

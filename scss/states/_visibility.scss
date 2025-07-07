@@ -1,0 +1,11 @@
+/* Visibility state utilities -------------------------------------------------*/
+
+// Hide element completely regardless of layout
+.is-hidden {
+  display: none !important;
+}
+
+// Generic active/display helper – components usually override with their own
+.is-active {
+  display: inherit !important;
+}

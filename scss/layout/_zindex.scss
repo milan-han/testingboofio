@@ -1,0 +1,11 @@
+$z-indices: (
+  "behind": -1,
+  "base": 1,
+  "ui": 100,
+  "overlay": 900,
+  "modal": 1000,
+);
+
+@mixin z($key) {
+  z-index: map-get($z-indices, $key);
+}

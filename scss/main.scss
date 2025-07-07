@@ -1,0 +1,26 @@
+@use "base/reset";
+@use "base/variables" as *;
+@use "base/typography";
+
+/* Layout */
+@use "layout/grid";
+@use "layout/zindex";
+
+/* Components (add more as they are implemented) */
+@use "components/chat";
+@use "components/retro-player";
+@use "components/social-panel";
+@use "components/player-card";
+@use "components/scoreboard";
+@use "components/buttons";
+@use "components/overlays";
+@use "components/game-menu";
+/* @use "components/feature-placeholder"; // Replaced by game-menu */
+
+/* UI States */
+@use "states/visibility";
+@use "states/transitions";
+
+/* Utilities */
+@use "utils/mixins";
+@use "utils/helpers";

@@ -1,0 +1,19 @@
+{
+  "name": "localboofio-main",
+  "version": "1.0.0",
+  "description": "This project is a small browser game. Open `index.html` in any modern web browser to start playing.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "sass": "^1.89.2",
+    "vite": "^7.0.2"
+  }
+}

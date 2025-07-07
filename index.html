@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Car Ball</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/scss/main.scss">
+</head>
+<body class="layout-grid">
+    <button class="login-btn">LOG IN</button>
+    <!-- Logo at top of page -->
+    <div class="logo-container">
+        <img src="assets/LOGO.png" alt="Cars N' Balls 10" class="game-logo">
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">LOBBY CHAT</div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message system">Welcome to Car Ball!</div>
+            <div class="chat-message friend">BuddyBot42: Ready to play some car ball?</div>
+        </div>
+        <div class="chat-input-area">
+            <div class="chat-prompt">/ to chat</div>
+            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." style="display: none;">
+        </div>
+    </div>
+
+
+
+    <!-- Social Panel -->
+    <div class="social-panel" id="socialPanel">
+        <div class="social-header">
+            <div class="social-title-container">
+                <div class="social-title">FRIENDS</div>
+                <button class="add-friend-icon-btn" id="addFriendToggleBtn" onclick="toggleAddFriendMode()">
+                    <img src="assets/add_friend_icon.png" alt="Add Friend" />
+                </button>
+            </div>
+            <div class="social-status">
+                <div class="status-indicator online" id="userStatus"></div>
+                <span class="status-text" id="userStatusText">ONLINE</span>
+            </div>
+        </div>
+        
+        <!-- Add friend dropdown container (will appear when button is clicked) -->
+        <div class="add-friend-dropdown" id="addFriendDropdown">
+            <div class="add-friend-input-container">
+                <input type="text" class="add-friend-input" id="addFriendInput" placeholder="USERNAME..." maxlength="12">
+                <button class="add-friend-btn" id="addFriendBtn" onclick="addFriend()">ADD</button>
+                <button class="cancel-add-btn" id="cancelAddBtn" onclick="cancelAddFriend()">✕</button>
+            </div>
+            <div class="friend-suggestions" id="friendSuggestions">
+                <!-- Suggestions will appear here -->
+            </div>
+        </div>
+        
+        <div class="friends-container">
+            <div class="friends-list" id="friendsList">
+                <!-- Friends will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Menu System -->
+    <div class="game-menu-container" id="gameMenuContainer">
+        <!-- Left Column -->
+        <div class="panel panel-play-options">
+            <div id="quickplay-btn" class="play-option active">
+                <div class="icon"></div><span>QUICKPLAY</span>
+            </div>
+            <div id="customplay-btn" class="play-option">
+                <div class="icon"></div><span>CUSTOMPLAY</span>
+            </div>
+            <div id="sandbox-panel" class="panel-sandbox hidden">
+                 <div class="sandbox-title">— SANDBOX —</div>
+                 <div class="sandbox-setting"><span>Car speed</span><input type="range"></div>
+                 <div class="sandbox-setting"><span>Car size</span><input type="range"></div>
+                 <div class="sandbox-setting"><span>Ball size</span><input type="range"></div>
+                 <div class="sandbox-setting"><span>Goal size</span><input type="range"></div>
+            </div>
+        </div>
+
+        <!-- Middle Column -->
+        <div class="panel panel-center-content">
+            <div class="panel-title"><h1>BOOFED.IO</h1></div>
+            <div id="mode-select-panel" class="panel-mode-select">
+                <div id="quickplay-options" class="mode-buttons">
+                    <button class="mode-btn active">1v1</button><button class="mode-btn">2v2</button>
+                </div>
+                <div id="customplay-options" class="hidden">
+                     <div class="game-options-row"><span class="game-options-label">Type</span><button class="option-btn active" data-type="timed">timed</button><button class="option-btn" data-type="points">points</button></div>
+                     <div class="game-options-row" id="time-options"><span class="game-options-label">Time</span><button class="option-btn active" data-time="1">1m</button><button class="option-btn" data-time="5">5m</button><button class="option-btn" data-time="10">10m</button><button class="option-btn" data-time="15">15m</button></div>
+                     <div class="game-options-row hidden" id="points-options"><span class="game-options-label">Points</span><button class="option-btn active" data-points="3">3</button><button class="option-btn" data-points="5">5</button><button class="option-btn" data-points="7">7</button><button class="option-btn" data-points="10">10</button></div>
+                </div>
+            </div>
+            <button class="panel-start" onclick="initiateCountdown()">PRESS F TO PLAY</button>
+        </div>
+
+        <!-- Right Column -->
+        <div class="panel panel-player-info">
+            <!-- Initial View -->
+            <div id="player-stats-panel" class="player-info-content">
+                <div class="username-section"><span>USERNAME ★</span></div>
+                <div class="stats-box">
+                    <ul class="stats-list">
+                        <li>103 wins</li>
+                        <li>40 wins</li>
+                        <li>103 wins</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Drivers View -->
+            <div id="drivers-panel" class="player-info-content hidden">
+                <div class="drivers-title">DRIVERS</div>
+                <div class="team-selection-grid">
+                    <div class="team-section">
+                        <div class="team-header">TEAM 1</div>
+                        <div class="team-dropzone" id="team1-zone" data-team="1">
+                            <div class="driver-card" draggable="true" data-driver="user">USER</div>
+                        </div>
+                    </div>
+                    <div class="team-section">
+                        <div class="team-header">TEAM 2</div>
+                        <div class="team-dropzone" id="team2-zone" data-team="2">
+                            <div class="driver-card" draggable="true" data-driver="fred">FRED</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="invite-player-btn" class="invite-player cursor-pointer">+ invite player +</div>
+        </div>
+    </div>
+
+    <!-- Invite Player Popup -->
+    <div id="invite-popup" class="popup-overlay hidden">
+        <div class="popup-content">
+            <div class="popup-option">NPC</div>
+            <div class="popup-option">LOCAL PLAYER</div>
+            <div class="popup-option">ONLINE PLAYER</div>
+            <div id="popup-close-btn" class="popup-close">+</div>
+        </div>
+    </div>
+
+    <!-- Countdown Overlay -->
+    <div class="countdown-overlay hidden" id="countdownOverlay">
+        <div class="countdown-number" id="countdownNumber">3</div>
+    </div>
+
+    <!-- Pause Menu Overlay -->
+    <div class="pause-overlay hidden" id="pauseOverlay">
+        <div class="pause-menu">
+            <div class="pause-title">GAME PAUSED</div>
+            <div class="pause-options">
+                <button class="pause-option-btn" id="resumeBtn" onclick="resumeGame()">RESUME</button>
+                <button class="pause-option-btn" id="restartBtn" onclick="restartMatch()">RESTART MATCH</button>
+                <button class="pause-option-btn" id="backToMenuBtn" onclick="returnToTitle()">BACK TO MENU</button>
+            </div>
+            <div class="pause-instructions">
+                <div class="control-hint">Press ESC or click RESUME to continue</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game End Overlay -->
+    <div class="game-end-overlay hidden" id="gameEndOverlay">
+        <div class="game-end-menu">
+            <div class="game-end-title" id="gameEndTitle">WINNER!</div>
+            <div class="game-end-subtitle" id="gameEndSubtitle">Player 1 Wins!</div>
+            <div class="final-score" id="finalScore">
+                <div class="final-score-row">
+                    <span id="finalP1Name">PLAYER 1</span>
+                    <span id="finalP1Score">5</span>
+                </div>
+                <div class="final-score-row">
+                    <span id="finalP2Name">PLAYER 2</span>
+                    <span id="finalP2Score">3</span>
+                </div>
+            </div>
+            <div class="game-end-options">
+                <button class="game-end-btn" id="playAgainBtn" onclick="playAgain()">PLAY AGAIN</button>
+                <button class="game-end-btn" id="backToMenuBtnEnd" onclick="returnToTitle()">BACK TO MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="scoreBoard" class="scoreboard">
+        <div class="score-title">SCOREBOARD</div>
+        <div class="score-row labels" id="scoreLabels">
+            <span>PLAYER 1</span>
+            <span>PLAYER 2</span>
+        </div>
+        <div class="score-row values" id="scoreValues">
+            <span id="topP1">0</span>
+            <span id="topP2">0</span>
+        </div>
+    </div>
+
+    <!-- Game control buttons -->
+    <button class="back-btn hidden" id="backBtn" onclick="returnToTitle()">BACK</button>
+    <button class="pause-btn hidden" id="pauseBtn">⏸</button>
+
+    <canvas id="game" width="960" height="600"></canvas>
+
+    <!-- Retro Commercial Player -->
+    <div class="retro-player">
+        <!-- Random retro-commercial video pulled from Google Drive -->
+        <video id="retroVideo" autoplay muted playsinline></video>
+        <div class="video-cover" role="button" tabindex="0"></div>
+        <div class="mute-icon" id="muteIcon" title="Unmute">
+            <img src="assets/Mute_Icon.svg" alt="Muted Icon" />
+        </div>
+    </div>
+
+    <!-- Player Card Panel -->
+    <div class="player-card player-1" id="playerCard">
+        <div class="player-card-header" id="playerCardName" onclick="editPlayerName(1)">
+            PLAYER 1
+            <input type="text" class="player-name-input" id="player1NameInput" maxlength="12" onblur="savePlayerName(1)" onkeypress="handleNameKeypress(event, 1)">
+        </div>
+        <canvas id="playerCardCanvas" width="240" height="320"></canvas>
+        <div class="color-selector" id="player1ColorSelector">
+            <div class="color-option" data-color="#c62828" style="background-color: #c62828;" onclick="selectCarColor(1, '#c62828')" title="Red"></div>
+            <div class="color-option" data-color="#2962ff" style="background-color: #2962ff;" onclick="selectCarColor(1, '#2962ff')" title="Blue"></div>
+            <div class="color-option" data-color="#7b1fa2" style="background-color: #7b1fa2;" onclick="selectCarColor(1, '#7b1fa2')" title="Purple"></div>
+            <div class="color-option" data-color="#f9a825" style="background-color: #f9a825;" onclick="selectCarColor(1, '#f9a825')" title="Yellow"></div>
+            <div class="color-option" data-color="#e91e63" style="background-color: #e91e63;" onclick="selectCarColor(1, '#e91e63')" title="Pink"></div>
+            <div class="color-option" data-color="#212121" style="background-color: #212121;" onclick="selectCarColor(1, '#212121')" title="Black"></div>
+        </div>
+    </div>
+
+    <!-- Player 2 Card Panel -->
+    <div class="player-card player-2" id="player2Card">
+        <div class="player-card-header" id="player2CardName" onclick="editPlayerName(2)">
+            PLAYER 2
+            <input type="text" class="player-name-input" id="player2NameInput" maxlength="12" onblur="savePlayerName(2)" onkeypress="handleNameKeypress(event, 2)">
+            <div class="player-dropdown" onclick="togglePlayer2Dropdown(event)"></div>
+            <div class="player-dropdown-menu" id="player2Dropdown">
+                <div class="dropdown-option" onclick="setPlayer2Type('human')">HUMAN</div>
+                <div class="dropdown-option" onclick="setPlayer2Type('npc')">NPC</div>
+            </div>
+        </div>
+        <canvas id="player2CardCanvas" width="240" height="320"></canvas>
+        <div class="color-selector" id="player2ColorSelector">
+            <div class="color-option" data-color="#2962ff" style="background-color: #2962ff;" onclick="selectCarColor(2, '#2962ff')" title="Blue"></div>
+            <div class="color-option" data-color="#c62828" style="background-color: #c62828;" onclick="selectCarColor(2, '#c62828')" title="Red"></div>
+            <div class="color-option" data-color="#7b1fa2" style="background-color: #7b1fa2;" onclick="selectCarColor(2, '#7b1fa2')" title="Purple"></div>
+            <div class="color-option" data-color="#f9a825" style="background-color: #f9a825;" onclick="selectCarColor(2, '#f9a825')" title="Yellow"></div>
+            <div class="color-option" data-color="#e91e63" style="background-color: #e91e63;" onclick="selectCarColor(2, '#e91e63')" title="Pink"></div>
+            <div class="color-option" data-color="#212121" style="background-color: #212121;" onclick="selectCarColor(2, '#212121')" title="Black"></div>
+        </div>
+        <div class="npc-difficulty-buttons" id="npcDifficultyButtons">
+            <button class="difficulty-btn" onclick="setNpcDifficulty(1)">1</button>
+            <button class="difficulty-btn" onclick="setNpcDifficulty(2)">2</button>
+            <button class="difficulty-btn" onclick="setNpcDifficulty(3)">3</button>
+            <button class="difficulty-btn" onclick="setNpcDifficulty(4)">4</button>
+            <button class="difficulty-btn" onclick="setNpcDifficulty(5)">5</button>
+            <button class="difficulty-btn" onclick="setNpcDifficulty(6)">6</button>
+            <button class="difficulty-btn" onclick="setNpcDifficulty(7)">7</button>
+            <button class="difficulty-btn" onclick="setNpcDifficulty(8)">8</button>
+            <button class="difficulty-btn" onclick="setNpcDifficulty(9)">9</button>
+            <button class="difficulty-btn active" onclick="setNpcDifficulty(10)">10</button>
+        </div>
+    </div>
+
+    <!-- Load modular JavaScript files in dependency order -->
+    <script src="js/room-state.js"></script>
+    <script src="js/globals.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/explosions.js"></script>
+    <script src="js/field.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/car.js"></script>
+    <script src="js/ball.js"></script>
+    <script src="js/collisions.js"></script>
+    <script src="js/game-state.js"></script>
+    <script src="js/social-panel.js"></script>
+    <script src="js/ui-add-player.js"></script>
+    <script src="js/ui-driver-menu.js"></script>
+    <script src="js/ui-player-cards.js"></script>
+    <script src="js/ui-chat-toggle.js"></script>
+    <script>
+        // ******** Game Menu System JavaScript ********
+        document.addEventListener('DOMContentLoaded', () => {
+            // Element References
+            const quickplayBtn = document.getElementById('quickplay-btn');
+            const customplayBtn = document.getElementById('customplay-btn');
+            const sandboxPanel = document.getElementById('sandbox-panel');
+            const quickplayOptions = document.getElementById('quickplay-options');
+            const customplayOptions = document.getElementById('customplay-options');
+            
+            const invitePlayerBtn = document.getElementById('invite-player-btn');
+            const invitePopup = document.getElementById('invite-popup');
+            const popupCloseBtn = document.getElementById('popup-close-btn');
+            const popupOptions = invitePopup.querySelectorAll('.popup-option');
+
+            const playerStatsPanel = document.getElementById('player-stats-panel');
+            const driversPanel = document.getElementById('drivers-panel');
+            const startButton = document.querySelector('.panel-start');
+
+            // Current menu state
+            let currentMenuMode = 'quickplay'; // 'quickplay' or 'customplay'
+            let hasPlayer2 = false;
+
+            // Toggle between Quick Play and Custom Play
+            quickplayBtn.addEventListener('click', () => {
+                currentMenuMode = 'quickplay';
+                quickplayBtn.classList.add('active');
+                customplayBtn.classList.remove('active');
+                sandboxPanel.classList.add('hidden');
+                quickplayOptions.classList.remove('hidden');
+                customplayOptions.classList.add('hidden');
+                
+                // Set global currentMode based on whether we have a player 2
+                if (hasPlayer2) {
+                    currentMode = 'npc'; // Local mode
+                } else {
+                    currentMode = 'matchmaking'; // Online mode
+                }
+                
+                updateStartButton();
+            });
+
+            customplayBtn.addEventListener('click', () => {
+                currentMenuMode = 'customplay';
+                customplayBtn.classList.add('active');
+                quickplayBtn.classList.remove('active');
+                sandboxPanel.classList.remove('hidden');
+                quickplayOptions.classList.add('hidden');
+                customplayOptions.classList.remove('hidden');
+
+                // Always local mode for custom play
+                currentMode = 'npc';
+                updateStartButton();
+            });
+
+            // Invite Player Flow
+            invitePlayerBtn.addEventListener('click', () => {
+                invitePopup.classList.remove('hidden');
+            });
+
+            popupCloseBtn.addEventListener('click', () => {
+                invitePopup.classList.add('hidden');
+            });
+            
+            invitePopup.addEventListener('click', (e) => {
+                if (e.target === invitePopup) {
+                    invitePopup.classList.add('hidden');
+                }
+            });
+
+            popupOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const optionType = option.textContent.trim();
+                    invitePopup.classList.add('hidden');
+                    
+                    // Add player 2 based on selection
+                    hasPlayer2 = true;
+                    playerStatsPanel.classList.add('hidden');
+                    driversPanel.classList.remove('hidden');
+                    
+                    // Add new driver to team system
+                    addNewDriverToTeam(optionType);
+                    
+                    // Show player 2 card
+                    const player2Card = document.getElementById('player2Card');
+                    if (player2Card) {
+                        player2Card.classList.remove('hidden');
+                        // Set up player 2 based on selection
+                        if (optionType === 'NPC') {
+                            setPlayer2Type('npc');
+                        } else {
+                            setPlayer2Type('human');
+                        }
+                    }
+                    
+                    // Update global mode
+                    currentMode = 'npc';
+                    
+                    // Enable local mode layout
+                    document.body.classList.add('local-mode');
+                    
+                    // Initialize player 2 if needed
+                    if (typeof initializePlayer2Card === 'function') {
+                        initializePlayer2Card();
+                    }
+                    
+                    updateStartButton();
+                });
+            });
+
+            // Handle button group clicks (for active states)
+            function handleButtonGroup(containerSelector, buttonSelector) {
+                const container = document.querySelector(containerSelector);
+                if (container) {
+                    container.addEventListener('click', (e) => {
+                        const button = e.target.closest(buttonSelector);
+                        if (button) {
+                            // Handle type switching specially
+                            if (button.dataset.type) {
+                                const typeButtons = container.querySelectorAll('[data-type]');
+                                typeButtons.forEach(btn => btn.classList.remove('active'));
+                                button.classList.add('active');
+                                
+                                // Show/hide appropriate options
+                                const timeOptions = document.getElementById('time-options');
+                                const pointsOptions = document.getElementById('points-options');
+                                
+                                if (button.dataset.type === 'timed') {
+                                    timeOptions.classList.remove('hidden');
+                                    pointsOptions.classList.add('hidden');
+                                } else {
+                                    timeOptions.classList.add('hidden');
+                                    pointsOptions.classList.remove('hidden');
+                                }
+                            } else {
+                                // Handle normal button groups
+                                const buttons = container.querySelectorAll(buttonSelector);
+                                buttons.forEach(btn => btn.classList.remove('active'));
+                                button.classList.add('active');
+                            }
+                            
+                            // Handle game settings
+                            if (containerSelector === '#customplay-options') {
+                                updateGameSettings();
+                            }
+                        }
+                    });
+                }
+            }
+
+            handleButtonGroup('#quickplay-options', '.mode-btn');
+            handleButtonGroup('#customplay-options', '.option-btn');
+
+            // Update start button text based on mode
+            function updateStartButton() {
+                // Always show "PRESS F TO PLAY" regardless of mode
+                startButton.textContent = 'PRESS F TO PLAY';
+            }
+
+            // Update game settings based on custom play options
+            function updateGameSettings() {
+                const activeTypeBtn = document.querySelector('#customplay-options [data-type].active');
+                
+                if (activeTypeBtn) {
+                    gameType = activeTypeBtn.dataset.type;
+                }
+                
+                if (gameType === 'timed') {
+                    const activeTimeBtn = document.querySelector('#time-options .option-btn.active');
+                    if (activeTimeBtn && activeTimeBtn.dataset.time) {
+                        matchTimeMinutes = parseInt(activeTimeBtn.dataset.time);
+                    }
+                } else if (gameType === 'points') {
+                    const activePointsBtn = document.querySelector('#points-options .option-btn.active');
+                    if (activePointsBtn && activePointsBtn.dataset.points) {
+                        pointsToWin = parseInt(activePointsBtn.dataset.points);
+                    }
+                }
+                
+                console.log('Updated game settings:', { gameType, matchTimeMinutes, pointsToWin });
+            }
+
+            // Enhanced start button functionality
+            startButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Direct start for all modes
+                startActualGame();
+            });
+
+            // Start the actual game
+            function startActualGame() {
+                // Update game settings one more time
+                updateGameSettings();
+                
+                // Hide the game menu
+                document.getElementById('gameMenuContainer').classList.add('hidden');
+                
+                // Start the game using existing function
+                if (typeof initiateCountdown === 'function') {
+                    initiateCountdown();
+                }
+            }
+
+            // Initialize
+            updateStartButton();
+            
+            // Initialize drag and drop functionality
+            initializeDragAndDrop();
+        });
+        
+        // Drag and Drop Team Selection System
+        function initializeDragAndDrop() {
+            const driverCards = document.querySelectorAll('.driver-card');
+            const dropZones = document.querySelectorAll('.team-dropzone');
+            
+            // Add drag event listeners to all driver cards
+            driverCards.forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+            });
+            
+            // Add drop event listeners to all drop zones
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+        
+        let draggedElement = null;
+        
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.outerHTML);
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        
+        function handleDragEnter(e) {
+            e.preventDefault();
+            
+            // Find the dropzone (could be the target or a parent)
+            let dropzone = e.target;
+            if (!dropzone.classList.contains('team-dropzone')) {
+                dropzone = dropzone.closest('.team-dropzone');
+            }
+            
+            if (dropzone) {
+                dropzone.classList.add('drag-over');
+            }
+        }
+        
+        function handleDragLeave(e) {
+            // Find the dropzone (could be the target or a parent)
+            let dropzone = e.target;
+            if (!dropzone.classList.contains('team-dropzone')) {
+                dropzone = dropzone.closest('.team-dropzone');
+            }
+            
+            if (dropzone) {
+                dropzone.classList.remove('drag-over');
+            }
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            
+            // Find the dropzone (could be the target or a parent)
+            let dropzone = e.target;
+            if (!dropzone.classList.contains('team-dropzone')) {
+                dropzone = dropzone.closest('.team-dropzone');
+            }
+            
+            if (dropzone) {
+                dropzone.classList.remove('drag-over');
+                
+                if (draggedElement && dropzone.classList.contains('team-dropzone')) {
+                    // Move the driver card to the new team
+                    const newCard = draggedElement.cloneNode(true);
+                    dropzone.appendChild(newCard);
+                    
+                    // Remove the original card
+                    draggedElement.remove();
+                    
+                    // Re-initialize drag and drop for the new card
+                    newCard.addEventListener('dragstart', handleDragStart);
+                    newCard.addEventListener('dragend', handleDragEnd);
+                    
+                    // Update team assignments
+                    updateTeamAssignments();
+                }
+            }
+        }
+        
+        function updateTeamAssignments() {
+            const team1Zone = document.getElementById('team1-zone');
+            const team2Zone = document.getElementById('team2-zone');
+            
+            const team1Players = Array.from(team1Zone.querySelectorAll('.driver-card')).map(card => card.dataset.driver);
+            const team2Players = Array.from(team2Zone.querySelectorAll('.driver-card')).map(card => card.dataset.driver);
+            
+            console.log('Team 1:', team1Players);
+            console.log('Team 2:', team2Players);
+            
+            // Update global game state if needed
+            // This could be used to set up actual team-based gameplay
+        }
+        
+        // Add new driver to team system
+        function addNewDriverToTeam(playerType) {
+            const team2Zone = document.getElementById('team2-zone');
+            const driverCount = document.querySelectorAll('.driver-card').length;
+            
+            // Generate unique driver name
+            let driverName = 'PLAYER ' + (driverCount + 1);
+            let driverKey = 'player' + (driverCount + 1);
+            
+            if (playerType === 'NPC') {
+                driverName = 'NPC ' + (driverCount);
+                driverKey = 'npc' + (driverCount);
+            } else if (playerType === 'LOCAL PLAYER') {
+                driverName = 'LOCAL ' + (driverCount);
+                driverKey = 'local' + (driverCount);
+            } else if (playerType === 'ONLINE PLAYER') {
+                driverName = 'ONLINE ' + (driverCount);
+                driverKey = 'online' + (driverCount);
+            }
+            
+            // Create new driver card
+            const newDriverCard = document.createElement('div');
+            newDriverCard.className = 'driver-card';
+            newDriverCard.draggable = true;
+            newDriverCard.dataset.driver = driverKey;
+            newDriverCard.textContent = driverName;
+            
+            // Add to team 2 by default
+            team2Zone.appendChild(newDriverCard);
+            
+            // Add drag event listeners
+            newDriverCard.addEventListener('dragstart', handleDragStart);
+            newDriverCard.addEventListener('dragend', handleDragEnd);
+            
+            // Update team assignments
+            updateTeamAssignments();
+        }
+    </script>
+    <script>
+        // ******** Retro-ad player logic using Google Drive videos ********
+        document.addEventListener('DOMContentLoaded', () => {
+            // -------- Fetch list of commercials from Internet Archive --------
+            const archiveId = '2007-wnac-tv-commercials';
+            const metadataUrl = `https://archive.org/metadata/${archiveId}`;
+
+            const videoEl = document.getElementById('retroVideo');
+            // Do not loop the same video; we will shuffle manually
+            videoEl.loop = false;
+            // Will hold the list of available MP4 files
+            let mp4s = [];
+
+            // Helper to pick a random commercial and play it
+            function playRandom() {
+                if (mp4s.length === 0) return; // List not ready yet
+                const randFile = mp4s[Math.floor(Math.random() * mp4s.length)].name;
+                const videoUrl = `https://archive.org/download/${archiveId}/${encodeURIComponent(randFile)}`;
+                videoEl.src = videoUrl;
+                videoEl.play().catch(() => {}); // Safeguard against autoplay blocking
+            }
+
+            fetch(metadataUrl)
+                .then(r => r.json())
+                .then(data => {
+                    const files = data?.files || [];
+                    mp4s = files.filter(f => /\.mp4$/i.test(f.name));
+                    if (mp4s.length === 0) throw new Error('No mp4 files found');
+                    playRandom();
+                })
+                .catch(err => {
+                    console.error('Failed to load archive video', err);
+                });
+
+            const cover = document.querySelector('.retro-player .video-cover');
+            const muteIcon = document.getElementById('muteIcon');
+
+            function updateIcon() {
+                muteIcon.style.display = videoEl.muted ? 'block' : 'none';
+            }
+
+            function toggleMute() {
+                videoEl.muted = !videoEl.muted;
+                // Ensure playback continues if some system action paused it
+                if (videoEl.paused) videoEl.play();
+                updateIcon();
+            }
+
+            // Click handlers
+            cover.addEventListener('click', toggleMute);
+            muteIcon.addEventListener('click', (e) => { e.stopPropagation(); toggleMute(); });
+
+            // When a commercial ends, queue up a new random one
+            videoEl.addEventListener('ended', playRandom);
+
+            // Auto-resume if video becomes paused (e.g. AirPods removed)
+            videoEl.addEventListener('pause', () => {
+                setTimeout(() => { if (videoEl.paused) videoEl.play(); }, 200);
+            });
+
+            updateIcon();
+        });
+    </script>
+
+    <!-- Device-Pixel-Ratio aware canvas resize -->
+    <script>
+        (function () {
+            const canvas = document.getElementById('game');
+            if (!canvas) return;
+            const ctx = window.ctx || canvas.getContext('2d');
+            const BASE_W = 960;
+            const BASE_H = 600;
+            const PIXEL_SCALE = 1.2;
+
+            function resize() {
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width  = BASE_W * dpr;
+                canvas.height = BASE_H * dpr;
+                canvas.style.width  = BASE_W * PIXEL_SCALE + 'px';
+                canvas.style.height = BASE_H * PIXEL_SCALE + 'px';
+                if (ctx && ctx.setTransform) {
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                }
+            }
+
+            function updateCanvasVisualScale() {
+                /* Fit canvas between chat panel and side panels while preserving aspect */
+                const chat = document.getElementById('chatPanel');
+                const side = document.getElementById('gameMenuContainer');
+                const chatW = chat ? chat.offsetWidth : 0;
+                const sideW = side ? side.offsetWidth : 0;
+                const availableW = window.innerWidth - chatW - sideW - 60; // horizontal space
+                /* Vertical space between logo and game menu */
+                const logo = document.querySelector('.logo-container');
+                const gameMenuContainer = document.getElementById('gameMenuContainer');
+                let availableH = window.innerHeight;
+                if (logo && gameMenuContainer) {
+                    const top = logo.getBoundingClientRect().bottom;
+                    const bottom = gameMenuContainer.getBoundingClientRect().top;
+                    availableH = bottom - top - 40; // padding
+                }
+
+                const cssWidth = BASE_W * PIXEL_SCALE;
+                const cssHeight = BASE_H * PIXEL_SCALE;
+                const maxScale = 1; // don't upscale beyond 1
+                const scale = Math.min(maxScale, availableW / cssWidth, availableH / cssHeight);
+                document.documentElement.style.setProperty('--canvas-scale', scale.toFixed(3));
+            }
+
+            window.addEventListener('resize', () => {
+                resize();
+                updateCanvasVisualScale();
+            });
+
+            resize();
+            updateCanvasVisualScale();
+        })();
+    </script>
+
+    <style id="responsive-style">
+        /* ===== CSS Custom Properties ===== */
+        :root {
+            --bg: #050510;
+            --panel-bg: #111418;
+            --accent: #c62828;
+            --border: #666666;
+        }
+
+        /* ===== Focus & Motion ===== */
+        button:focus,
+        [role="button"]:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .start-game-button {
+                animation: none !important;
+            }
+        }
+
+        /* ===== Breakpoints: Responsive Grid (≤768px) ===== */
+        @media (max-width: 768px) {
+            body {
+                display: grid;
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto auto auto;
+                grid-template-areas:
+                    "logo"
+                    "canvas"
+                    "controls"
+                    "chat"
+                    "side";
+                height: 100vh;
+                background: var(--bg);
+            }
+
+            .logo-container     { grid-area: logo;    justify-self: center; }
+            #game               { grid-area: canvas;  position: static !important; justify-self: center; align-self: start; margin-top: 10px; }
+            .game-menu-container{ grid-area: controls;position: static !important; justify-self: stretch; margin: 10px 0; }
+            .chat-panel         { grid-area: chat;    position: static !important; width: 100%; height: 200px; }
+
+            .player-card        { grid-area: side;    position: static !important; justify-self: center; margin-top: 20px; }
+        }
+
+        /* ===== Very Small Screens (≤480px) ===== */
+        @media (max-width: 480px) {
+            #game {
+                transform: scale(0.5) !important;
+            }
+        }
+    </style>
+</body>
+</html> 
+ 
