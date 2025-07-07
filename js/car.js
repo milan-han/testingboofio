@@ -56,6 +56,11 @@ class Car {
         }
 
         // Allow control except during countdown or if celebrating and not the celebrationDriver
+        const gameStore = window.GameStore;
+        const gameState = gameStore ? gameStore.get('gameState') : 'setup';
+        const celebrating = gameStore ? gameStore.get('celebrating') : false;
+        const celebrationDriver = gameStore ? gameStore.get('celebrationDriver') : null;
+        
         if (gameState === "countdown" || (celebrating && this !== celebrationDriver)) return;
 
         // Capture previous handbrake state then update current
@@ -179,6 +184,9 @@ class Car {
         // Use base canvas dimensions instead of DPR-scaled dimensions
         const baseWidth = 960;
         const baseHeight = 600;
+        
+        const gameStore = window.GameStore;
+        const gameState = gameStore ? gameStore.get('gameState') : 'setup';
         
         if (gameState === "setup") {
             // Lock cars to field boundaries (inside the white lines) for ALL demo modes

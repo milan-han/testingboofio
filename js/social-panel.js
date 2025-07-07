@@ -1,5 +1,5 @@
 // Social Panel functionality with fake friends data
-export class SocialPanel {
+class SocialPanel {
     constructor() {
         this.friends = [
             { id: 1, name: 'RETRO_RACER', online: true, lastSeen: 'Now' },
@@ -339,25 +339,23 @@ export class SocialPanel {
     }
 }
 
-// Initialize social panel when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.socialPanel = new SocialPanel();
-});
+// Initialize social panel immediately
+window.socialPanel = new SocialPanel();
 
-// Export helper functions as named exports
-export function addFriend() {
+// Global helper functions for HTML onclick handlers
+function addFriend() {
     if (window.socialPanel) {
         window.socialPanel.addFriend();
     }
 }
 
-export function toggleAddFriendMode() {
+function toggleAddFriendMode() {
     if (window.socialPanel) {
         window.socialPanel.toggleAddFriendMode();
     }
 }
 
-export function cancelAddFriend() {
+function cancelAddFriend() {
     if (window.socialPanel) {
         window.socialPanel.cancelAddFriend();
     }

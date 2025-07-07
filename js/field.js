@@ -7,6 +7,11 @@ function drawField() {
     const baseWidth = 960;
     const baseHeight = 600;
     
+    const gameStore = window.GameStore;
+    const gameState = gameStore ? gameStore.get('gameState') : 'setup';
+    const worldOffsetX = gameStore ? gameStore.get('worldOffsetX') : 0;
+    const worldOffsetY = gameStore ? gameStore.get('worldOffsetY') : 0;
+    
     // --- Background ---
     if (gameState === "menu") {
         // Asphalt city roads background
@@ -94,7 +99,16 @@ function drawField() {
 function updatePracticeCamera() {
     // Keep the camera static in demo (setup) mode by resetting any world offset
     // This disables the external camera pan entirely.
-    worldOffsetX = 0;
-    worldOffsetY = 0;
+    const gameStore = window.GameStore;
+    if (gameStore) {
+        gameStore.set({
+            worldOffsetX: 0,
+            worldOffsetY: 0
+        });
+    } else {
+        // Fallback to global variables
+        worldOffsetX = 0;
+        worldOffsetY = 0;
+    }
     // No further processing required.
 } 

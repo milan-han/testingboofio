@@ -31,6 +31,11 @@ function gameLoop(currentTime = 0) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawField();
     
+    const gameStore = window.GameStore;
+    const gameState = gameStore ? gameStore.get('gameState') : 'setup';
+    const currentMode = gameStore ? gameStore.get('currentMode') : 'npc';
+    const player2IsNPC = gameStore ? gameStore.get('player2IsNPC') : true;
+    
     if (gameState === "setup") {
         // Practice playground logic
         player.update(deltaTime);
@@ -109,8 +114,14 @@ function gameLoop(currentTime = 0) {
             const hits = [];
             player.update(deltaTime);
             if (handleCarBallCollision(player)) hits.push(player);
+            const npcMode = gameStore ? gameStore.get('npcMode') : false;
             if (npcMode) {
-                npcUpdate(player2, ball, deltaTime);
+                // Use the new NPCAI module if available, otherwise fallback to global function
+                if (window.NPCAI) {
+                    window.NPCAI.update(player2, ball, deltaTime);
+                } else if (window.npcUpdate) {
+                    window.npcUpdate(player2, ball, deltaTime);
+                }
             } else {
                 player2.update(deltaTime);
             }
@@ -138,7 +149,15 @@ function gameLoop(currentTime = 0) {
             updateAllParticles(deltaTime);
         } else {
             // Celebration physics - use actual elapsed time instead of assuming 16ms frames
+            const celebrating = gameStore ? gameStore.get('celebrating') : false;
+            let celebrateTimer = gameStore ? gameStore.get('celebrateTimer') : 0;
+            let gameSpeed = gameStore ? gameStore.get('gameSpeed') : 1.0;
+            const explodedCar = gameStore ? gameStore.get('explodedCar') : null;
+            const SLOWMO_START_MS = 900;
+            const CELEBRATION_MS = 1500;
+            
             celebrateTimer += rawDeltaTime; // Use actual time elapsed, not assumed frame time
+            if (gameStore) gameStore.set('celebrateTimer', celebrateTimer);
                 
             if (celebrateTimer >= SLOWMO_START_MS) {
                 const slowmoProgress = (celebrateTimer - SLOWMO_START_MS) / (CELEBRATION_MS - SLOWMO_START_MS);
@@ -148,6 +167,7 @@ function gameLoop(currentTime = 0) {
             } else {
                 gameSpeed = 1.0;
             }
+            if (gameStore) gameStore.set('gameSpeed', gameSpeed);
             
             const winningCar = explodedCar === player ? player2 : player;
             
@@ -168,13 +188,30 @@ function gameLoop(currentTime = 0) {
             updateAllParticles(deltaTime);
 
             if (celebrateTimer >= CELEBRATION_MS) {
-                celebrating = false;
-                celebrationDriver = null;
-                gameSpeed = 1.0;
-                carExplosions = [];
-                scorchMarks = [];
-                explodedCar = null;
-                resetBall();
+                if (gameStore) {
+                    gameStore.set({
+                        celebrating: false,
+                        celebrationDriver: null,
+                        gameSpeed: 1.0,
+                        explodedCar: null
+                    });
+                } else {
+                    celebrating = false;
+                    celebrationDriver = null;
+                    gameSpeed = 1.0;
+                    explodedCar = null;
+                }
+                
+                // Clear explosion effects
+                if (window.carExplosions) window.carExplosions.length = 0;
+                if (window.scorchMarks) window.scorchMarks.length = 0;
+                
+                // Reset ball using MatchController if available
+                if (window.MatchController) {
+                    window.MatchController.resetBall();
+                } else if (window.resetBall) {
+                    window.resetBall();
+                }
                 
                 // Use base canvas dimensions instead of DPR-scaled dimensions
                 const baseWidth = 960;

@@ -4,19 +4,28 @@
 flowchart TD
     subgraph Title-Screen
         UIPanels["Side Panels & Bottom Menu"]
-        RoomState[("RoomState – global store")]
+        RoomState[("RoomState – lobby store")]
         UIAddPlayer["ui-add-player.js"]
         UIPlayerCards["ui-player-cards.js"]
         UIDriverMenu["ui-driver-menu.js"]
         UIChatToggle["ui-chat-toggle.js"]
     end
 
+    subgraph Core-System
+        GameStore[("GameStore – state management")]
+        CanvasRenderer["CanvasRenderer – scaling"]
+        MatchController["MatchController – game flow"]
+        PlayerManager["PlayerManager – player logic"]
+        NPCAI["NPCAI – bot behavior"]
+        ChatUtils["ChatUtils – messaging"]
+        Helpers["Helpers – utilities"]
+    end
+
     subgraph Gameplay
-        Globals["globals.js – core loop"]
+        Globals["globals.js – compatibility layer"]
         GameState["game-state.js"]
         CarJS("car.js")
         BallJS("ball.js")
-        NPC_AI["npcUpdate()"]
     end
 
     % Relationships
@@ -27,15 +36,38 @@ flowchart TD
     RoomState -- subscribes --> UIDriverMenu
     RoomState -- subscribes --> UIPlayerCards
     RoomState -- subscribes --> UIChatToggle
-    RoomState -- all_ready --> Globals
-    Globals --> GameState
-    Globals --> NPC_AI
+    RoomState -- all_ready --> MatchController
+    
+    % Core system relationships
+    MatchController --> GameStore
+    PlayerManager --> GameStore
+    NPCAI --> GameStore
+    MatchController --> CanvasRenderer
+    ChatUtils --> Helpers
+    
+    % Legacy integration
+    Globals --> GameStore
+    Globals --> MatchController
+    Globals --> PlayerManager
+    Globals --> NPCAI
+    Globals --> ChatUtils
+    GameState --> GameStore
+    CarJS --> GameStore
+    BallJS --> GameStore
 ```
 
 ## Key Points
-1. **RoomState** (in `js/room-state.js`) is *the* source-of-truth for the lobby. All UI widgets only read/write via its API (`addPlayer`, `removePlayer`, `updatePlayer`, `markReady`, etc.).
-2. Legacy gameplay code (`globals.js`, `game-state.js`, etc.) is largely *stateless* regarding multiplayer; it only consumes **snapshots** of `RoomState` right before kickoff.
-3. New lobby code is loaded with plain `<script>` tags (non-module) for ease of integration. It attaches `RoomState` to `window` for compatibility with older logic.
+
+### 2024 Modular Refactor
+1. **GameStore** (in `js/core/game-store.js`) is *the* source-of-truth for game state. All game variables now flow through this centralized store with a subscribe pattern.
+2. **Modular Architecture** – The 1400+ line `globals.js` monolith has been decomposed into focused modules under `js/core/`, `js/ui/`, and `js/utils/`.
+3. **Backward Compatibility** – The refactored `globals.js` provides a compatibility layer using property getters/setters that delegate to the new modules.
+4. **Subscribe Pattern** – Components can subscribe to specific state changes (e.g., `gameStore.subscribe('scoreP1', callback)`) for reactive updates.
+
+### Lobby System
+1. **RoomState** (in `js/room-state.js`) handles lobby/multiplayer state. All UI widgets read/write via its API (`addPlayer`, `removePlayer`, `updatePlayer`, `markReady`, etc.).
+2. **State Separation** – Game state (scores, celebration, etc.) lives in `GameStore`. Lobby state (players, teams, ready status) lives in `RoomState`.
+3. **Module Loading** – All code is loaded with plain `<script>` tags (non-module) for maximum compatibility. Dependencies are loaded in order in `index.html`.
 
 ---
 
@@ -109,45 +141,86 @@ function onPressF() {
 
 ## Files of Interest (Cheat-sheet)
 
+### Core System (New Modular Architecture)
 | Path | Responsibility |
 |------|----------------|
-| `js/room-state.js` | Central lobby store & pub/sub. |
+| `js/core/game-store.js` | Centralized state management with subscribe pattern. |
+| `js/core/canvas-renderer.js` | Canvas setup, responsive scaling, zoom controls. |
+| `js/core/match-controller.js` | Game flow: countdown, start, pause, win conditions. |
+| `js/core/player-manager.js` | Player management, color selection, name editing, settings. |
+| `js/core/npc-ai.js` | NPC behavior, difficulty levels, dialogue system. |
+| `js/ui/chat-utils.js` | Chat message handling, styling, player color integration. |
+| `js/utils/helpers.js` | Utility functions: color manipulation, drawing helpers. |
+
+### UI & Lobby System
+| Path | Responsibility |
+|------|----------------|
+| `js/room-state.js` | Central lobby store & pub/sub for multiplayer. |
 | `js/ui-add-player.js` | Pop-over, "ADD PLAYER" flow, restrictions. |
 | `js/ui-player-cards.js` | Bottom-right local cards + chat hide/show. |
 | `js/ui-driver-menu.js` | Team assignment, ready decals, leave room. |
 | `js/ui-chat-toggle.js` | Auto-hides chat for splitscreen locals. |
-| `js/globals.js` | Massive legacy file: input handling, Press-F logic, NPC AI. |
 | `js/social-panel.js` | Friends list UI, add/remove/invite logic. |
-| `js/field.js` | Draws the field & preview canvas. |
+
+### Legacy Files (Refactored)
+| Path | Responsibility |
+|------|----------------|
+| `js/globals.js` | Compatibility layer + essential utilities (refactored from 1400+ lines). |
 | `js/game-state.js` | Runs countdown & transitions between `setup`/`playing`/`ended`. |
+| `js/field.js` | Draws the field & preview canvas. |
 
 ---
 
 ## Roadmap / Next Steps
 
+### ✅ Completed (2024 Refactor)
+1. **Modular Architecture** ✅  
+   • Successfully decomposed 1400+ line `globals.js` monolith into focused modules.
+   • Implemented centralized `GameStore` with subscribe pattern.
+   • Created compatibility layer for seamless backward compatibility.
+2. **Testing Foundation** ✅  
+   • Added Vitest unit testing framework.
+   • Created test structure for new modules.
+
+### 🔄 In Progress / Next Steps
 1. **Real-time Multiplayer Layer**  
    • Replace in-memory `RoomState` with network-synchronised store (WebSocket or WebRTC).  
    • Implement peer-to-server quick-match queue (for Quickplay) & room link join.
-2. **Refactor Gameplay Loop**  
-   • Decouple `globals.js` monolith; move car/ball physics into ECS or at least separate modules.
-3. **Sandbox Live Tweaks**  
+2. **Complete Module Migration**  
+   • Migrate remaining UI functions (drawPlayerCard, etc.) to dedicated modules.
+   • Refactor car/ball physics to use GameStore directly.
+3. **Enhanced Testing**  
+   • Expand unit test coverage for all new modules.
+   • Add integration tests for state management flows.
+4. **Sandbox Live Tweaks**  
    • Build UI sliders bound to `RoomState.sandbox` multipliers.  
    • Broadcast changes to all peers & hot-apply to in-progress matches.
-4. **Responsive / Mobile**  
+5. **Responsive / Mobile**  
    • Audit SCSS for fixed pixel values; adopt rem/viewport units.
-5. **Testing & Tooling**  
-   • Add Vitest for unit tests (e.g., AI steering).  
+6. **Code Quality**  
    • ESLint + Prettier config to stabilise code style.
-6. **Accessibility & UX**  
+   • Performance optimization using the new modular structure.
+7. **Accessibility & UX**  
    • Keyboard trap for pop-overs, ARIA labels on draggable driver cards.
 
 ---
 
 ## Navigation Tips for Developers
 
-* **Search pattern**: UI files all start with `ui-*`. Gameplay core is under plain filenames (`car.js`, `ball.js`, etc.).
-* **Global variables** in `globals.js` still leak; when adding new features **prefer RoomState → subscribe pattern**.
-* **Hot-reloading**: project uses **Vite** (see `vite.config.js`). Run `npm run dev` to start local server with HMR.
+### File Organization (Post-Refactor)
+* **Core modules**: `js/core/*` contains the main game logic (state, rendering, match flow, players, AI).
+* **UI utilities**: `js/ui/*` contains reusable UI components and utilities.
+* **Shared helpers**: `js/utils/*` contains utility functions used across the codebase.
+* **Legacy files**: UI files start with `ui-*`. Core gameplay is in `car.js`, `ball.js`, etc.
+
+### State Management
+* **Game state**: Use `GameStore.get()` and `GameStore.set()` for all game variables. Subscribe to changes with `GameStore.subscribe()`.
+* **Lobby state**: Use `RoomState` API for multiplayer/lobby functionality.
+* **Avoid global variables**: The compatibility layer in `globals.js` redirects to modules, but prefer direct module usage.
+
+### Development Workflow
+* **Hot-reloading**: Project uses **Vite** (see `vite.config.js`). Run `npm run dev` to start local server with HMR.
+* **Testing**: Run `npm test` for unit tests. New modules have test coverage under `tests/unit/`.
 * **Sass**: Entry point `scss/main.scss` compiles via the Vite plugin – use variables in `base/_variables.scss`.
 * **Chrome DevTools grid/flex overlay** is invaluable for inspecting the complex layout. Toggle via `⌥-⌘-C → Layout`.
 

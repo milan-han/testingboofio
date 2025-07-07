@@ -58,10 +58,21 @@ vite.config.js   Build/dev tooling config
 ```
 
 ### Key JavaScript Files
-* `js/room-state.js` – Central lobby store & pub/sub
-* `js/globals.js`    – Core game loop, input, NPC AI
-* `js/ui-*.js`       – UI widgets (menu, chat, driver cards)
-* `js/game-state.js` – State machine for `setup → playing → ended`
+
+**Core System (Modular Architecture):**
+* `js/core/game-store.js`    – Centralized state management with subscribe pattern
+* `js/core/canvas-renderer.js` – Canvas setup and responsive scaling
+* `js/core/match-controller.js` – Game flow (countdown, start, pause, win conditions)
+* `js/core/player-manager.js` – Player management, colors, settings
+* `js/core/npc-ai.js`        – NPC behavior and difficulty management
+* `js/ui/chat-utils.js`      – Chat message handling and styling
+* `js/utils/helpers.js`      – Utility functions (color manipulation, drawing)
+
+**Legacy Files (Refactored):**
+* `js/room-state.js`   – Central lobby store & pub/sub
+* `js/globals.js`      – Compatibility layer + essential utilities (refactored from 1400+ lines)
+* `js/ui-*.js`         – UI widgets (menu, chat, driver cards)
+* `js/game-state.js`   – State machine for `setup → playing → ended`
 
 ### SCSS Organisation
 `scss/main.scss` is the entry point that `@use`s partials under:
@@ -75,8 +86,17 @@ vite.config.js   Build/dev tooling config
 
 ## 3&nbsp;·&nbsp;Navigating the Code
 
+### Modular Architecture (2024 Refactor)
+The codebase has been refactored from a single 1400+ line `globals.js` monolith into focused, testable modules:
+
+1. **State Management** `GameStore` replaces global variables with a subscribe pattern. All game state flows through this centralized store.
+2. **Module Structure** Core functionality is organized under `js/core/`, UI utilities under `js/ui/`, and shared helpers under `js/utils/`.
+3. **Backward Compatibility** The refactored `globals.js` provides a compatibility layer so existing code continues to work seamlessly.
+4. **Dependency Order** Modules are loaded in dependency order in `index.html` (core → utils → UI → game logic).
+
+### Navigation Guidelines
 1. **UI vs Gameplay**   UI scripts are prefixed with `ui-` while gameplay physics/AI live in single-purpose files like `car.js` and `ball.js`.
-2. **Lobby Flow**       `RoomState` is the **single source of truth** for players, teams, and ready status. All UI reads/writes via its API.
+2. **State Management** `GameStore` is the **single source of truth** for game state. `RoomState` handles lobby/multiplayer state.
 3. **Sass Variables**   Colours, spacing, and typography tokens sit in `scss/base/_variables.scss`; follow them to stay on-brand.
 4. **HTML Entrypoint**  `index.html` wires everything together with classic `<script>` tags for maximum compatibility. Vite injects the compiled CSS bundle at runtime.
 
@@ -105,7 +125,12 @@ All guides are plain Markdown—open them in your IDE, on GitHub, or render with
 | Start dev server (HMR) | `npm run dev` |
 | Build production bundle | `npm run build` |
 | Add a new colour token | `scss/base/_variables.scss` |
-| Tune NPC difficulty | `js/globals.js` → `npcUpdate()` |
+| Tune NPC difficulty | `js/core/npc-ai.js` → `NPCAI` class |
+| Modify game state logic | `js/core/game-store.js` → `GameStore` class |
+| Update match flow (countdown, pause) | `js/core/match-controller.js` → `MatchController` class |
+| Change player management | `js/core/player-manager.js` → `PlayerManager` class |
+| Modify chat functionality | `js/ui/chat-utils.js` → `ChatUtils` class |
+| Add utility functions | `js/utils/helpers.js` |
 | Change countdown duration | `js/game-state.js` |
 | Run all tests | `npm test` |
 

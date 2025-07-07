@@ -101,10 +101,31 @@ class Ball {
 
 // Goal detection and celebration
 function startCelebration(goalSide) {
-    celebrating = true;
-    celebrateTimer = 0;
-    if(goalSide === "left") scoreP2 += 1; else scoreP1 += 1;
-    updateUI();
+    const gameStore = window.GameStore;
+    
+    if (gameStore) {
+        gameStore.set('celebrating', true);
+        gameStore.set('celebrateTimer', 0);
+        
+        // Update scores using GameStore
+        if (goalSide === "left") {
+            gameStore.incrementScore(2); // Player 2 scored
+        } else {
+            gameStore.incrementScore(1); // Player 1 scored
+        }
+    } else {
+        // Fallback to global variables
+        celebrating = true;
+        celebrateTimer = 0;
+        if(goalSide === "left") scoreP2 += 1; else scoreP1 += 1;
+    }
+    
+    // Update UI
+    if (window.MatchController) {
+        window.MatchController.updateUI();
+    } else if (window.updateUI) {
+        window.updateUI();
+    }
 
     // Check win conditions after scoring
     setTimeout(() => {

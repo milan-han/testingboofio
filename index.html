@@ -272,6 +272,21 @@
 
     <!-- Load modular JavaScript files in dependency order -->
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    
+    <!-- Core modules (no dependencies) -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/core/game-store.js"></script>
+    <script src="js/core/canvas-renderer.js"></script>
+    
+    <!-- UI modules (depend on core) -->
+    <script src="js/ui/chat-utils.js"></script>
+    
+    <!-- Game logic modules (depend on core and UI) -->
+    <script src="js/core/npc-ai.js"></script>
+    <script src="js/core/match-controller.js"></script>
+    <script src="js/core/player-manager.js"></script>
+    
+    <!-- Original files (maintained for compatibility) -->
     <script src="js/room-state.js"></script>
     <script src="js/network.js"></script>
     <script src="js/network-game-sync.js"></script>
@@ -291,6 +306,26 @@
     <script src="js/ui-chat-toggle.js"></script>
     <script src="js/ui-game-menu.js"></script>
     <script src="js/room-join.js"></script>
+    
+    <!-- Initialize modular systems -->
+    <script>
+        // Initialize the new modular systems once DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize player manager
+            if (window.PlayerManager) {
+                window.PlayerManager.initialize();
+            }
+            
+            // Subscribe to game state changes for UI updates
+            if (window.GameStore) {
+                window.GameStore.subscribe(['scoreP1', 'scoreP2'], function() {
+                    if (window.MatchController) {
+                        window.MatchController.updateUI();
+                    }
+                });
+            }
+        });
+    </script>
 <script>
         // ******** Retro-ad player logic using Google Drive videos ********
         document.addEventListener('DOMContentLoaded', () => {
